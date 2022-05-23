@@ -1,9 +1,9 @@
 # Target specific macros
 nxtOSEK = /usr/local/mindstorms/nxtOSEK
-TARGET = bluetooth
+TARGET = helloworld_OSEK
 TARGET_SOURCES = \
-	bluetooth.c
-TOPPERS_OSEK_OIL_SOURCE = ./bluetooth.oil
+	helloworld.c
+TOPPERS_OSEK_OIL_SOURCE = ./helloworld.oil
 ROOT=$(nxtOSEK)
 
 # Don't modify below part
