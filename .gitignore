@@ -1,0 +1,8 @@
+*.sh
+*.elf
+*.bin
+*.rxe
+*.map
+build
+kernel_id.h
+kernel_cfg.c
