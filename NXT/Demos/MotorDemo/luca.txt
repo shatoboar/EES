@@ -1,0 +1,13 @@
+Ablauf:
+
+    init:
+        numberBoxes, currentPosition, currentPositionPrecise = calibrate()
+        int currentPostion
+        int numberBoxes
+    
+    Main:
+        dispense()
+        moveToCamera()
+        int numberBox = getCameraData()
+        currentPosition = moveToBox(numberBox, currentPosition)
+        dropItem()
