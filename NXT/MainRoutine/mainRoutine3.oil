@@ -37,11 +37,7 @@
       EVENT RightButtonOffEvent {
         MASK = AUTO;
       };
-
-      EVENT ThrowStoneOnEvent {
-        MASK = AUTO;
-      };
-
+        
 
       /* Definition of resource */
       RESOURCE ResourceNumber
@@ -53,13 +49,13 @@
       TASK EventDispatcherTask
       {
         AUTOSTART = FALSE;
-        PRIORITY = 5;
+        PRIORITY = 10;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
       };
 
-      TASK ThrowStoneTask
+      TASK MainTask
       {
         AUTOSTART = TRUE
         {
@@ -69,9 +65,7 @@
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
-        EVENT = ThrowStoneOnEvent;    
       };
-
 
       /* Definition of EventCallback */
       TASK EventBigButtonTask
@@ -80,7 +74,7 @@
         {
           APPMODE = appmode1;
         };
-        PRIORITY = 2;
+        PRIORITY = 3;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
@@ -96,7 +90,7 @@
         {
           APPMODE = appmode1;
         };
-        PRIORITY = 3;
+        PRIORITY = 2;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
@@ -109,7 +103,7 @@
       TASK LCDTask
       {
         AUTOSTART = FALSE;
-        PRIORITY = 1;
+        PRIORITY = 11;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */

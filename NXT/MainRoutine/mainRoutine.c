@@ -12,18 +12,17 @@
     /* OSEK declarations */
     DeclareCounter(SysTimerCnt);
 
-    DeclareTask(EventDispatcher);
-    DeclareTask(EventBigButton);
-    DeclareTask(EventRightButton);
-    DeclareTask(TaskLCD);
-    DeclareTask(ThrowStone);
+    DeclareTask(EventDispatcherTask);
+    DeclareTask(EventBigButtonTask);
+    DeclareTask(EventRightButtonTask);
+    DeclareTask(LCDTask);
+    DeclareTask(ThrowStoneTask);
 
     DeclareEvent(BigButtonOnEvent); /* Event declaration */
     DeclareEvent(BigButtonOffEvent); /* Event declaration */
     DeclareEvent(RightButtonOnEvent);
     DeclareEvent(RightButtonOffEvent);
     DeclareEvent(ThrowStoneOnEvent);
-    DeclareEvent(ThrowStoneOffEvent);
 
     DeclareResource(ResourceNumber);
 
@@ -80,20 +79,20 @@
     }
 
     /* EventDispatcher executed every 1ms */
-    TASK(EventDispatcher)
+    TASK(EventDispatcherTask)
     {
         U8 isPressed = 0;
         U8 isPressedRight = 0;
 
         static bool wasPressedLastTick = false;
         static bool wasPressedRightLastTick = false;
-
+/*
         //middle big button dispatching
         isPressed = ecrobot_is_ENTER_button_pressed();
         if (isPressed == 1 && !wasPressedLastTick) {
-            SetEvent(EventBigButton, BigButtonOnEvent);
+            SetEvent(EventBigButtonTask, BigButtonOnEvent);
         } else if (isPressed == 0 && wasPressedLastTick) {
-          SetEvent(EventBigButton, BigButtonOffEvent);
+          SetEvent(EventBigButtonTask, BigButtonOffEvent);
         }
         wasPressedLastTick = isPressed;
 
@@ -101,33 +100,35 @@
       //right button dispatching
       isPressedRight = ecrobot_is_RUN_button_pressed();
       if (isPressedRight == 1 && !wasPressedRightLastTick) {
-          SetEvent(EventRightButton, RightButtonOnEvent);
+          SetEvent(EventRightButtonTask, RightButtonOnEvent);
       } else if (isPressedRight == 0 && wasPressedRightLastTick) {
-        SetEvent(EventRightButton, RightButtonOffEvent);
+        SetEvent(EventRightButtonTask, RightButtonOffEvent);
       }
       wasPressedRightLastTick = isPressedRight;    
-
+*/
 
 
       U16 light_data = ecrobot_get_light_sensor(NXT_PORT_S1);
       GetResource(ResourceNumber);
       val = light_data;
       ReleaseResource(ResourceNumber);
-      if (val >= 600) {
-        nxt_motor_set_speed(NXT_PORT_A, 100, 1);
+      if (val >= 500) {
+        nxt_motor_set_speed(NXT_PORT_B, 100, 1);
       } else {
-        nxt_motor_set_speed(NXT_PORT_A, 0, 1);
-        //SetEvent(ThrowStone, ThrowStoneOnEvent);
+        //nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+        //moveOneUnit(1, 100);
+        SetEvent(ThrowStoneTask, ThrowStoneOnEvent);
       }
 
       TerminateTask();
     }
 
-    TASK(ThrowStone) {
+    TASK(ThrowStoneTask) {
       while (1)
       {
         WaitEvent(ThrowStoneOnEvent);
         ClearEvent(ThrowStoneOnEvent);
+        nxt_motor_set_speed(NXT_PORT_B, 0, 1);
         dropItem();
       }
 
@@ -135,7 +136,7 @@
     }
 
     /* EventCallback executed by OSEK Events */
-    TASK(EventBigButton)
+    TASK(EventBigButtonTask)
     {
       
       while(1)
@@ -177,7 +178,7 @@
       TerminateTask();
     }
 
-    TASK(EventRightButton) 
+    TASK(EventRightButtonTask) 
     {
       while (1) 
       {
@@ -205,8 +206,8 @@
     }
 
 
-    /* TaskLCD executed every 100ms */
-    TASK(TaskLCD)
+    /* LCDTask executed every 100ms */
+    TASK(LCDTask)
     {
       display_clear(1);
 

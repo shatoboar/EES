@@ -38,10 +38,34 @@
         MASK = AUTO;
       };
 
-      EVENT ThrowStoneOnEvent {
+      EVENT ThrowStoneEvent {
         MASK = AUTO;
       };
 
+      EVENT StoneDetectedEvent {
+        MASK = AUTO;
+      };
+
+      EVENT DropStoneEvent {
+        MASK = AUTO;
+      };
+
+      EVENT MoveDoneEvent {
+        MASK = AUTO;
+      };
+
+      EVENT ContinueLineEvent {
+        MASK = AUTO;
+      };
+
+      EVENT StopLineEvent {
+        MASK = AUTO;
+      };
+      
+      EVENT StoneOnLineEvent {
+        MASK = AUTO;
+      };
+        
 
       /* Definition of resource */
       RESOURCE ResourceNumber
@@ -53,7 +77,32 @@
       TASK EventDispatcherTask
       {
         AUTOSTART = FALSE;
-        PRIORITY = 5;
+        PRIORITY = 10;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+      };
+
+      TASK MoveToBoxTask
+      {
+        AUTOSTART = TRUE
+        {
+          APPMODE = appmode1;
+        };
+        PRIORITY = 7;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+        EVENT = StoneOnLineEvent;
+      };
+
+      TASK TmpMoveTask
+      {
+        AUTOSTART = TRUE
+        {
+          APPMODE = appmode1;
+        };
+        PRIORITY = 6;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
@@ -65,13 +114,24 @@
         {
           APPMODE = appmode1;
         };
+        PRIORITY = 5;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+      };
+
+      TASK ReadyForStoneTask
+      {
+        AUTOSTART = TRUE
+        {
+          APPMODE = appmode1;
+        };
         PRIORITY = 4;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
-        EVENT = ThrowStoneOnEvent;    
+        EVENT = DropStoneEvent;
       };
-
 
       /* Definition of EventCallback */
       TASK EventBigButtonTask
@@ -80,7 +140,7 @@
         {
           APPMODE = appmode1;
         };
-        PRIORITY = 2;
+        PRIORITY = 3;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
@@ -96,7 +156,7 @@
         {
           APPMODE = appmode1;
         };
-        PRIORITY = 3;
+        PRIORITY = 2;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
@@ -109,7 +169,7 @@
       TASK LCDTask
       {
         AUTOSTART = FALSE;
-        PRIORITY = 1;
+        PRIORITY = 11;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
