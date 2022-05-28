@@ -3,6 +3,7 @@
 *.bin
 *.rxe
 *.map
+*.DS_Store
 build
 kernel_id.h
 kernel_cfg.c
