@@ -4,8 +4,7 @@ TARGET = mainRoutine3
 TARGET_SOURCES = \
 	mainRoutine3.c \
 	duties.c \
-	motor_helper.c \
-	mainTask.c
+	motor_helper.c
 TOPPERS_OSEK_OIL_SOURCE = ./mainRoutine3.oil
 ROOT=$(nxtOSEK)
 

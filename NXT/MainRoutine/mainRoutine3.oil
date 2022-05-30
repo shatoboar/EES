@@ -21,26 +21,27 @@
       APPMODE appmode1{};
 
       /* Definition of Touch Sensor ON Event */
-      EVENT BigButtonOnEvent {
+      /*EVENT BigButtonOnEvent {
         MASK = AUTO;
-      };
+      };*/
 
       /* Definition of Touch Sensor OFF Event */
-      EVENT BigButtonOffEvent {
+      /*EVENT BigButtonOffEvent {
         MASK = AUTO;
-      };
+      };*/
 
+/*
       EVENT RightButtonOnEvent {
         MASK = AUTO;
       };
 
       EVENT RightButtonOffEvent {
         MASK = AUTO;
-      };
+      };*/
         
 
       /* Definition of resources */
-      RESOURCE ResourceLightThreshold
+      /*RESOURCE ResourceLightThreshold
       {
         RESOURCEPROPERTY = STANDARD;
       };
@@ -60,16 +61,29 @@
       {
         RESOURCEPROPERTY = STANDARD;
       };
+      RESOURCE ResourceMode
+      {
+        RESOURCEPROPERTY = STANDARD;
+      };*/
+      RESOURCE ResourceMainRobot
+      {
+        RESOURCEPROPERTY = STANDARD;
+      };
+      RESOURCE ResourceExecuteCommand
+      {
+        RESOURCEPROPERTY = STANDARD;
+      };
+
 
       /* Definition of EventDispatcher */
       TASK EventDispatcherTask
       {
         AUTOSTART = FALSE;
-        PRIORITY = 10;
+        PRIORITY = 3;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
-        RESOURCE = ResourceLightThreshold;
+        RESOURCE = ResourceMainRobot;
       };
 
       TASK MainTask
@@ -78,18 +92,22 @@
         {
           APPMODE = appmode1;
         };
-        PRIORITY = 4;
+        PRIORITY = 5;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
-        RESOURCE = ResourceLightThreshold;
+
+        RESOURCE = ResourceMainRobot;
+        RESOURCE = ResourceExecuteCommand;
+        /*RESOURCE = ResourceLightThreshold;
         RESOURCE = ResourceDirection;
         RESOURCE = ResourceBoxesRemaining;
         RESOURCE = ResourceNextBoxTarget;
         RESOURCE = ResourceCurrentBox;
+        RESOURCE = ResourceMode;*/
       };
 
-      /* Definition of EventCallback */
+      /*
       TASK EventBigButtonTask
       {
         AUTOSTART = TRUE
@@ -99,12 +117,12 @@
         PRIORITY = 4;
         ACTIVATION = 1;
         SCHEDULE = FULL;
-        STACKSIZE = 512; /* Stack size */
+        STACKSIZE = 512;
         EVENT = BigButtonOnEvent;
         EVENT = BigButtonOffEvent;
-      };
+      };*/
 
-      /* Definition of EventCallback */
+      /*
       TASK EventRightButtonTask
       {
         AUTOSTART = TRUE
@@ -114,21 +132,22 @@
         PRIORITY = 2;
         ACTIVATION = 1;
         SCHEDULE = FULL;
-        STACKSIZE = 512; /* Stack size */
+        STACKSIZE = 512;
         EVENT = RightButtonOnEvent;
         EVENT = RightButtonOffEvent;
-      };
+      };*/
       
 
       /* Definition of TaskLCD */
       TASK LCDTask
       {
         AUTOSTART = FALSE;
-        PRIORITY = 11;
+        PRIORITY = 10;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
-
+        RESOURCE = ResourceMainRobot;
+        RESOURCE = ResourceExecuteCommand;
       };
 
       /* Definition of OSEK Alarm Counter */
