@@ -39,8 +39,24 @@
       };
         
 
-      /* Definition of resource */
-      RESOURCE ResourceNumber
+      /* Definition of resources */
+      RESOURCE ResourceLightThreshold
+      {
+        RESOURCEPROPERTY = STANDARD;
+      };
+      RESOURCE ResourceDirection
+      {
+        RESOURCEPROPERTY = STANDARD;
+      };
+      RESOURCE ResourceBoxesRemaining
+      {
+        RESOURCEPROPERTY = STANDARD;
+      };
+      RESOURCE ResourceNextBoxTarget
+      {
+        RESOURCEPROPERTY = STANDARD;
+      };
+      RESOURCE ResourceCurrentBox
       {
         RESOURCEPROPERTY = STANDARD;
       };
@@ -53,6 +69,7 @@
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
+        RESOURCE = ResourceLightThreshold;
       };
 
       TASK MainTask
@@ -65,6 +82,11 @@
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
+        RESOURCE = ResourceLightThreshold;
+        RESOURCE = ResourceDirection;
+        RESOURCE = ResourceBoxesRemaining;
+        RESOURCE = ResourceNextBoxTarget;
+        RESOURCE = ResourceCurrentBox;
       };
 
       /* Definition of EventCallback */
@@ -74,13 +96,12 @@
         {
           APPMODE = appmode1;
         };
-        PRIORITY = 3;
+        PRIORITY = 4;
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
         EVENT = BigButtonOnEvent;
         EVENT = BigButtonOffEvent;
-        RESOURCE = ResourceNumber;
       };
 
       /* Definition of EventCallback */
@@ -107,7 +128,7 @@
         ACTIVATION = 1;
         SCHEDULE = FULL;
         STACKSIZE = 512; /* Stack size */
-        RESOURCE = ResourceNumber;
+
       };
 
       /* Definition of OSEK Alarm Counter */
@@ -145,7 +166,7 @@
         AUTOSTART = TRUE
         {
           ALARMTIME = 1;
-          CYCLETIME = 100; /* TaskLCD is executed every 100msec */
+          CYCLETIME = 10; /* TaskLCD is executed every 100msec */ //TODO CHANGE BACK TO 100
           APPMODE = appmode1;
         };
       };
