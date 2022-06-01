@@ -36,11 +36,26 @@ vector<Point> detect_max_color(Mat mask) {
     return large_contour;
 }
 
-void box_creater(Mat img, vector<Point> contour, int r, int g, int b, string name) {
+void box_creator(Mat img, vector<Point> contour, int r, int g, int b, string name) {
     Scalar color(r,g,b);
     Rect area = boundingRect(Mat (contour));
     rectangle(img, area, color,1,8,0);
-    putText(img, name, Point (50,50), FONT_ITALIC, 0.6, Scalar (0, 255, 0));
+    putText(img, name, contour[0], FONT_ITALIC, 0.8, Scalar (139, 35, 35));
+}
+
+void show(Mat img, vector<Point> red, vector<Point> green, vector<Point> blue, vector<Point> yellow) {
+    if (red.size() > 0) {
+        box_creator(img, red, 0, 0, 255, "Red Colour");
+    }
+    if (green.size() > 0) {
+        box_creator(img, green, 0, 255, 0, "Green Colour");
+    }
+    if (blue.size() > 0) {
+        box_creator(img, blue, 255, 0, 0, "Blue Colour");
+    }
+    if (yellow.size() > 0) {
+        box_creator(img, yellow, 255, 255, 255, "Yellow Colour");
+    }
 }
 
 int main(int argc,char* argv[]) {
@@ -61,7 +76,7 @@ int main(int argc,char* argv[]) {
 
     // set color range green and define mask
     Scalar green_lower = Scalar(36, 25, 25);
-    Scalar green_upper = Scalar(76, 25, 255);
+    Scalar green_upper = Scalar(76, 255, 255);
     inRange(img_hsv, green_lower, green_upper, green_mask);
 
     // set color range blue and define mask
@@ -86,11 +101,14 @@ int main(int argc,char* argv[]) {
 
 
     vector<Point> redCounter = detect_max_color(red_mask);
-    box_creater(img.clone(), redCounter, 0, 0, 255, "Red Colour");
+    vector<Point> greenCounter = detect_max_color(green_mask);
+    vector<Point> blueCounter = detect_max_color(blue_mask);
+    vector<Point> yellowCounter = detect_max_color(yellow_mask);
+    show(img, redCounter, greenCounter, blueCounter, yellowCounter);
+
 
     namedWindow(argv[1], WINDOW_NORMAL);
     imshow(argv[1], img);
-    //cap.release()
-    waitKey(4000);
+    waitKey(6000);
     destroyAllWindows();
 }
