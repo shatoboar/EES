@@ -18,14 +18,12 @@ using namespace cv;
  * @param mask
  * @return null pointer or vector
  */
-vector<Point> *detect_max_color(Mat mask) {
+vector<Point> detect_max_color(Mat mask) {
     int max_area = 0;
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
     vector<cv::Point> large_contour;
     findContours( mask, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
-
-    if (contours.size() == 0) return nullptr;
 
     for(int i = 0; i < contours.size(); i++){
         int area = (int)cv::contourArea(contours[i]);
@@ -35,14 +33,14 @@ vector<Point> *detect_max_color(Mat mask) {
         }
     }
 
-    return &large_contour;
+    return large_contour;
 }
 
 void box_creater(Mat img, vector<Point> contour, int r, int g, int b, string name) {
     Scalar color(r,g,b);
     Rect area = boundingRect(Mat (contour));
     rectangle(img, area, color,1,8,0);
-    putText(img, name, Point (50,50), FONT_ITALIC, 0.6, (0, 255, 0));
+    putText(img, name, Point (50,50), FONT_ITALIC, 0.6, Scalar (0, 255, 0));
 }
 
 int main(int argc,char* argv[]) {
@@ -87,7 +85,7 @@ int main(int argc,char* argv[]) {
     bitwise_and(img, img, res_yellow, yellow_mask);
 
 
-    vector<Point> redCounter = *detect_max_color(red_mask);
+    vector<Point> redCounter = detect_max_color(red_mask);
     box_creater(img.clone(), redCounter, 0, 0, 255, "Red Colour");
 
     namedWindow(argv[1], WINDOW_NORMAL);
