@@ -13,36 +13,39 @@
 using namespace std;
 using namespace cv;
 
-vector<Point>detect_max_color(Mat mask) {
-    double largestArea = 0;
-    double largest_area = 0;
-    int largest_contour_index = -1;
-    vector<vector<Point> > contours; // is like contours, hierarchy in python
-    findContours(mask.clone(), contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
-    contours.resize(contours.size());
+/**
+ * returns biggest area for parameter mask or null pointer
+ * @param mask
+ * @return null pointer or vector
+ */
+vector<Point> *detect_max_color(Mat mask) {
+    int max_area = 0;
+    vector<vector<Point> > contours;
+    vector<Vec4i> hierarchy;
+    vector<cv::Point> large_contour;
+    findContours( mask, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
 
-    for (size_t k = 0; k < contours.size(); k++) {
-        double a = contourArea(contours[k], false);  //  Find the area of contour
-        if (a > largest_area) {
-            largest_area = a;
-            largest_contour_index = k;                //Store the index of largest contour
+    if (contours.size() == 0) return nullptr;
+
+    for(int i = 0; i < contours.size(); i++){
+        int area = (int)cv::contourArea(contours[i]);
+        if (area > max_area) {
+            large_contour = contours[i];
+            max_area = area;
         }
     }
 
-    return contours[largest_area-1];
+    return &large_contour;
 }
 
-def box_creater(contour, r, g, b, name):
-x, y, w, h = cv2.boundingRect(contour)
-cv2.rectangle(img, (x, y),
-(x + w, y + h),
-(r, g, b), 2)
+void box_creater(Mat img, vector<Point> contour, int r, int g, int b, string name) {
+    Scalar color(r,g,b);
+    Rect area = boundingRect(Mat (contour));
+    rectangle(img, area, color,1,8,0);
+    putText(img, name, Point (50,50), FONT_ITALIC, 0.6, (0, 255, 0));
+}
 
-cv2.putText(img, name, (x, y),
-cv2.FONT_HERSHEY_SIMPLEX,
-2.0, (0, 0, 0))
-
-int main( int argc, char *argv[]) {
+int main(int argc,char* argv[]) {
     Mat img, img_hsv;
     Mat red_mask, green_mask, blue_mask, yellow_mask;
     Mat res_red, res_green, res_blue, res_yellow;
@@ -84,4 +87,12 @@ int main( int argc, char *argv[]) {
     bitwise_and(img, img, res_yellow, yellow_mask);
 
 
+    vector<Point> redCounter = *detect_max_color(red_mask);
+    box_creater(img.clone(), redCounter, 0, 0, 255, "Red Colour");
+
+    namedWindow(argv[1], WINDOW_NORMAL);
+    imshow(argv[1], img);
+    //cap.release()
+    waitKey(4000);
+    destroyAllWindows();
 }
