@@ -1,0 +1,218 @@
+
+
+    #include "implementation.oil"
+
+    CPU ATMEL_AT91SAM7S256
+    {
+      OS LEJOS_OSEK
+      {
+        STATUS = EXTENDED;
+        STARTUPHOOK = FALSE;
+        ERRORHOOK = FALSE;
+        SHUTDOWNHOOK = FALSE;
+        PRETASKHOOK = FALSE;
+        POSTTASKHOOK = FALSE;
+        USEGETSERVICEID = FALSE;
+        USEPARAMETERACCESS = FALSE;
+        USERESSCHEDULER = FALSE;
+      };
+
+      /* Definition of application mode */
+      APPMODE appmode1{};
+
+      /* Definition of Touch Sensor ON Event */
+      EVENT BigButtonOnEvent {
+        MASK = AUTO;
+      };
+
+      /* Definition of Touch Sensor OFF Event */
+      EVENT BigButtonOffEvent {
+        MASK = AUTO;
+      };
+
+      EVENT RightButtonOnEvent {
+        MASK = AUTO;
+      };
+
+      EVENT RightButtonOffEvent {
+        MASK = AUTO;
+      };
+
+      EVENT ThrowStoneEvent {
+        MASK = AUTO;
+      };
+
+      EVENT StoneDetectedEvent {
+        MASK = AUTO;
+      };
+
+      EVENT DropStoneEvent {
+        MASK = AUTO;
+      };
+
+      EVENT MoveDoneEvent {
+        MASK = AUTO;
+      };
+
+      EVENT ContinueLineEvent {
+        MASK = AUTO;
+      };
+
+      EVENT StopLineEvent {
+        MASK = AUTO;
+      };
+      
+      EVENT StoneOnLineEvent {
+        MASK = AUTO;
+      };
+        
+
+      /* Definition of resource */
+      RESOURCE ResourceNumber
+      {
+        RESOURCEPROPERTY = STANDARD;
+      };
+
+      /* Definition of EventDispatcher */
+      TASK EventDispatcherTask
+      {
+        AUTOSTART = FALSE;
+        PRIORITY = 10;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+      };
+
+      TASK MoveToBoxTask
+      {
+        AUTOSTART = TRUE
+        {
+          APPMODE = appmode1;
+        };
+        PRIORITY = 7;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+        EVENT = StoneOnLineEvent;
+      };
+
+      TASK TmpMoveTask
+      {
+        AUTOSTART = TRUE
+        {
+          APPMODE = appmode1;
+        };
+        PRIORITY = 6;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+      };
+
+      TASK ThrowStoneTask
+      {
+        AUTOSTART = TRUE
+        {
+          APPMODE = appmode1;
+        };
+        PRIORITY = 5;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+      };
+
+      TASK ReadyForStoneTask
+      {
+        AUTOSTART = TRUE
+        {
+          APPMODE = appmode1;
+        };
+        PRIORITY = 4;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+        EVENT = DropStoneEvent;
+      };
+
+      /* Definition of EventCallback */
+      TASK EventBigButtonTask
+      {
+        AUTOSTART = TRUE
+        {
+          APPMODE = appmode1;
+        };
+        PRIORITY = 3;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+        EVENT = BigButtonOnEvent;
+        EVENT = BigButtonOffEvent;
+        RESOURCE = ResourceNumber;
+      };
+
+      /* Definition of EventCallback */
+      TASK EventRightButtonTask
+      {
+        AUTOSTART = TRUE
+        {
+          APPMODE = appmode1;
+        };
+        PRIORITY = 2;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+        EVENT = RightButtonOnEvent;
+        EVENT = RightButtonOffEvent;
+      };
+      
+
+      /* Definition of TaskLCD */
+      TASK LCDTask
+      {
+        AUTOSTART = FALSE;
+        PRIORITY = 11;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+        RESOURCE = ResourceNumber;
+      };
+
+      /* Definition of OSEK Alarm Counter */
+      COUNTER SysTimerCnt
+      {
+        MINCYCLE = 1;
+        MAXALLOWEDVALUE = 10000;
+        TICKSPERBASE = 1; /* One tick is equal to 1msec */
+      };
+
+      /* Definition of EventDispatcher execution timing */
+      ALARM cyclic_alarm1
+      {
+        COUNTER = SysTimerCnt;
+        ACTION = ACTIVATETASK
+        {
+          TASK = EventDispatcherTask;
+        };
+        AUTOSTART = TRUE
+        {
+          ALARMTIME = 1;
+          CYCLETIME = 1; /* EventDispatcher is executed every 1msec */
+          APPMODE = appmode1;
+        };
+      };
+
+      /* Definition of TaskLCD execution timing */
+      ALARM cyclic_alarmLCD
+      {
+        COUNTER = SysTimerCnt;
+        ACTION = ACTIVATETASK
+        {
+          TASK = LCDTask  ;
+        };
+        AUTOSTART = TRUE
+        {
+          ALARMTIME = 1;
+          CYCLETIME = 100; /* TaskLCD is executed every 100msec */
+          APPMODE = appmode1;
+        };
+      };
+    };
