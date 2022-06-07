@@ -145,7 +145,7 @@ TASK(IdleTask)
 {
     static SINT bt_status = BT_NO_INIT;
     static U8 bt_send_buf[4]; 
-    static U8 bt_receive_buf[10];
+    static U8 bt_receive_buf[4];
 
     while(1)
     {  
@@ -160,12 +160,12 @@ TASK(IdleTask)
             display_string("[BT] \n");
             display_update();
 
-            bt_send_buf[0] = 25;
-            bt_send_buf[1] = 26; 
+            bt_send_buf[0] = 13;
+            bt_send_buf[1] = 27; 
             /* for (int i = 0; i < 32; i++) { */
             /*     bt_send_buf[i] = 1; */ /* } */
 
-            ecrobot_send_bt(bt_send_buf, 0, 1);
+            ecrobot_send_bt(bt_send_buf, 0, 4);
             /* display_string("Sent message\n"); */
             /* display_unsigned(bt_send_buf[0], 2); */
             /* display_string("\n"); */
@@ -173,7 +173,8 @@ TASK(IdleTask)
 
             int read = 0;
             while(read == 0){
-                 read = ecrobot_read_bt(bt_receive_buf, 0, 10);
+                 read = ecrobot_read_bt(bt_receive_buf, 0, 4);
+                 systick_wait_ms(2000);
             }
             
             display_unsigned(read, 2);
@@ -182,6 +183,11 @@ TASK(IdleTask)
             display_unsigned(bt_receive_buf[0], 2);
             display_string("\n");
             display_unsigned(bt_receive_buf[1], 2);
+            display_string("\n");
+            display_unsigned(bt_receive_buf[2], 2);
+            display_string("\n");
+            display_unsigned(bt_receive_buf[3], 2);
+            display_string("\n");
             display_update();
 
         }
