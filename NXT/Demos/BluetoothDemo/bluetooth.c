@@ -1,6 +1,4 @@
-/* btslave.c */ 
-#include <stdio.h>
-#include <stdlib.h>
+/* /1* btslave.c *1/ */ 
 #include <string.h> 
 #include "kernel.h"
 #include "kernel_id.h"
@@ -16,6 +14,9 @@ DeclareEvent(TouchSensorOffEvent);
 
 /* below macro enables run-time Bluetooth connection */
 #define RUNTIME_CONNECTION
+
+void itoa(int n, char s[]);
+char *reverse(char *str);
 
 /* LEJOS OSEK hooks */
 void ecrobot_device_initialize()
@@ -45,7 +46,7 @@ void user_1ms_isr_type2(void)
 /* EventDispatcher executed every 5ms */
 TASK(EventDispatcher)
 {
-    static U8 bt_receive_buf[32]; 
+    static U8 bt_receive_buf[1]; 
     static U8 TouchSensorStatus_old = 0;
     U8 TouchSensorStatus; 
 
@@ -99,11 +100,52 @@ TASK(EventHandler)
     TerminateTask();
 }
 
+char *reverse(char *str)
+{
+    char tmp, *src, *dst;
+    size_t len;
+    if (str != NULL)
+    {
+        len = strlen (str);
+        if (len > 1) {
+            src = str;
+            dst = src + len - 1;
+            while (src < dst) {
+                tmp = *src;
+                *src++ = *dst;
+                *dst-- = tmp;
+            }
+        }
+    }
+    return str;
+}
+
+void itoa(int n, char s[]) 
+{
+    int i, sign;
+
+    if ((sign = n) < 0)        /* record sign */
+        n = -n;                /* make n positive */
+    i = 0;
+
+    do {                       /* generate digits in reverse order */
+        s[i++] = n % 10 + '0'; /* get next digit */
+    } while ((n /= 10) > 0);   /* delete it */
+
+    if (sign < 0)
+        s[i++] = '-';
+
+    reverse(s);
+    s[i] = '\0';
+    return;
+}
+
 /* IdleTask */
 TASK(IdleTask)
 {
     static SINT bt_status = BT_NO_INIT;
-    static U8 bt_send_buf[32]; 
+    static U8 bt_send_buf[4]; 
+    static U8 bt_receive_buf[10];
 
     while(1)
     {  
@@ -118,20 +160,32 @@ TASK(IdleTask)
             display_string("[BT] \n");
             display_update();
 
-            bt_send_buf[0] = 255;
+            bt_send_buf[0] = 25;
+            bt_send_buf[1] = 26; 
             /* for (int i = 0; i < 32; i++) { */
-            /*     bt_send_buf[i] = 1; */
-            /* } */
+            /*     bt_send_buf[i] = 1; */ /* } */
 
-            ecrobot_send_bt_packet(bt_send_buf, 32);
-            display_string("Sent message ");
-            display_string(bt_send_buf[31]);
-            display_string("\n!!");
+            ecrobot_send_bt(bt_send_buf, 0, 1);
+            /* display_string("Sent message\n"); */
+            /* display_unsigned(bt_send_buf[0], 2); */
+            /* display_string("\n"); */
+            /* display_update(); */
 
-
-            display_update();
+            int read = 0;
+            while(read == 0){
+                 read = ecrobot_read_bt(bt_receive_buf, 0, 10);
+            }
             
+            display_unsigned(read, 2);
+            display_string("\n");
+            display_string("Received message\n");
+            display_unsigned(bt_receive_buf[0], 2);
+            display_string("\n");
+            display_unsigned(bt_receive_buf[1], 2);
+            display_update();
+
         }
         bt_status = ecrobot_get_bt_status();
     }	
 }
+
