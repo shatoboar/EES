@@ -4,11 +4,16 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
 
+void printBits(uint8_t num);
+
 int main(int argc, char **argv)
 {
+
+    printf("Starting the program...\n");
+    fflush(stdout);
     struct sockaddr_rc addr = { 0 };
     int s, status;
-    char dest[18] = "94:B8:6D:2C:39:85";
+    char dest[18] = "00:16:53:0F:77:72";
 
     // allocate a socket
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
@@ -20,14 +25,44 @@ int main(int argc, char **argv)
 
     // connect to server
     status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
-
     // send a message
     if( status == 0 ) {
-        status = write(s, "hello!", 6);
+        printf("Connection successful\n");
+        fflush(stdout);
     }
 
-    if( status < 0 ) perror("uh oh");
+    //read data from the client
+    uint8_t buf[4];
+    int bytes_read;
+    uint8_t send_buf[1];
+    send_buf[0]=23;
+
+    bytes_read = read(s, buf, sizeof(buf));
+    if( bytes_read > 0 ) {
+	for (int i = 0; i < bytes_read; i++) {
+		printf("[");
+		printf("%d", buf[i]);
+		printf("]\n");
+	}
+	printf("%d\n", bytes_read);    
+    }
+    if(status==0){
+    	status = write(s, "jamlo",5);
+	printf("sent!!!");
+    }
+
+    if (status < 0) perror("uh oh");
 
     close(s);
     return 0;
+}
+
+void printBits(uint8_t num)
+{
+   for(int bit=0;bit<(sizeof(uint8_t) * 8); bit++)
+   {
+      printf("%i ", num & 0x01);
+      num = num >> 1;
+   }
+	
 }
