@@ -34,8 +34,11 @@ int main(int argc, char **argv)
     //read data from the client
     uint8_t buf[4];
     int bytes_read;
-    uint8_t send_buf[1];
-    send_buf[0]=23;
+    uint8_t send_buf[10];
+    send_buf[0]=37;
+    send_buf[1]=49;
+    send_buf[2]=51;
+    send_buf[3]=99;
 
     bytes_read = read(s, buf, sizeof(buf));
     if( bytes_read > 0 ) {
@@ -47,9 +50,10 @@ int main(int argc, char **argv)
 	printf("%d\n", bytes_read);    
     }
     if(status==0){
-    	status = write(s, "jamlo",5);
+    	status = write(s,send_buf, 10);
 	printf("sent!!!");
     }
+
 
     if (status < 0) perror("uh oh");
 
