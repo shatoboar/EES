@@ -28,18 +28,54 @@ vector<Point> ColorDetection::getYellowCounter() {
     return yellowCounter;
 }
 
-vector<Point> detect_max_color(Mat mask) {
+//int colour represents the colour of objects that are searched for, o=red, 1=green, 2=blue, 3=yellow
+vector<Point> detect_max_color(Mat mask, int colour, ColorDetection *c) {
     int max_area = 0;
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
     vector<cv::Point> large_contour;
     findContours( mask, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
+    int object_counter = 0;
 
     for(int i = 0; i < contours.size(); i++){
         int area = (int)cv::contourArea(contours[i]);
-        if (area > max_area && area > 4000) {
+        if (area > 20000) {
+            object_counter++;
+            if(area> max_area)
             large_contour = contours[i];
             max_area = area;
+        }
+    }
+
+    if(object_counter > 0){
+        if(colour == 0){
+            c->redBrick = true;
+            if(object_counter > 1){
+                c->redBrickOnlyOne = false;
+            }else{
+                c->redBrickOnlyOne = true;
+            }
+        }else if(colour == 1){
+            c->greenBrick = true;
+            if(object_counter > 1){
+                c->greenBrickOnlyOne = false;
+            }else{
+                c->greenBrickOnlyOne = true;
+            }
+        }else if(colour == 2){
+            c->blueBrick = true;
+            if(object_counter > 1){
+                c->blueBrickOnlyOne = false;
+            }else{
+                c->blueBrickOnlyOne = true;
+            }
+        }else if(colour == 3){
+            c->yellowBrick = true;
+            if(object_counter > 1){
+                c->yellowBrickOnlyOne = false;
+            }else{
+                c->yellowBrickOnlyOne = true;
+            }
         }
     }
 
@@ -105,51 +141,45 @@ ColorDetection::ColorDetection(char* filename) {
     bitwise_and(img, img, res_blue, blue_mask);
     bitwise_and(img, img, res_yellow, yellow_mask);
 
-    redCounter = detect_max_color(red_mask);
-    greenCounter = detect_max_color(green_mask);
-    blueCounter = detect_max_color(blue_mask);
-    yellowCounter = detect_max_color(yellow_mask);
-
-    if(redCounter.size() > 0){
-        redBrick = true;
-    }else{
-        redBrick = false;
-    }
-
-    if(greenCounter.size() > 0){
-        greenBrick = true;
-    }else{
-        greenBrick = false;
-    }
-
-    if(blueCounter.size() > 0){
-        blueBrick = true;
-    }else{
-        blueBrick = false;
-    }
-
-    if(yellowCounter.size() > 0){
-        yellowBrick = true;
-    }else{
-        yellowBrick = false;
-    }
+    redCounter = detect_max_color(red_mask, 0,this);
+    greenCounter = detect_max_color(green_mask, 1, this);
+    blueCounter = detect_max_color(blue_mask, 2, this);
+    yellowCounter = detect_max_color(yellow_mask, 3, this);
 }
 
 int main(int argc, char* argv[]){
     ColorDetection newDetection(argv[1]);
     if(newDetection.redBrick != newDetection.greenBrick != newDetection.blueBrick != newDetection.yellowBrick){
         if(newDetection.redBrick){
-            cout << "Red Brick On Line";
+            if(newDetection.redBrickOnlyOne){
+                cout << "Red Brick On Line";
+            }else{
+                cout << "More than one red brick on line";
+            }
         }else if(newDetection.greenBrick){
-            cout << "Green Brick On Line";
+            if(newDetection.greenBrickOnlyOne){
+                cout << "Green Brick On Line";
+            }else{
+                cout << "More than one green brick on line";
+            }
         }else if(newDetection.blueBrick){
-            cout << "Blue Brick On Line";
+            if(newDetection.blueBrickOnlyOne){
+                cout << "Blue Brick On Line";
+            }else{
+                cout << "More than one blue brick on line ";
+            }
         }else if(newDetection.yellowBrick){
-            cout << "Yellow Brick On Line";
+            if(newDetection.yellowBrickOnlyOne){
+                cout << "Yellow Brick On Line";
+            }else{
+                cout << "More than one yellow brick on line";
+            }
         }
+    }else if(!newDetection.redBrick && !newDetection.greenBrick && !newDetection.blueBrick && !newDetection.yellowBrick){
+        cout << "Mistake no object on the line";
     }else{
-        cout << "Mistake more than one brick";
+        cout << "Mistake more than one colour of bricks on the line";
     }
     cout << "\n";
-    //show(newDetection.img, newDetection.redCounter, newDetection.greenCounter, newDetection.blueCounter, newDetection.yellowCounter, newDetection);
+    show(newDetection.img, newDetection.redCounter, newDetection.greenCounter, newDetection.blueCounter, newDetection.yellowCounter, newDetection);
 }

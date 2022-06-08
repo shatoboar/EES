@@ -21,10 +21,14 @@ public:
         vector<Point> greenCounter;
         vector<Point> blueCounter;
         vector<Point> yellowCounter;
-        bool redBrick;
-        bool greenBrick;
-        bool blueBrick;
-        bool yellowBrick;
+        bool redBrick = false;
+        bool greenBrick = false;
+        bool blueBrick = false;
+        bool yellowBrick = false;
+        bool redBrickOnlyOne;
+        bool greenBrickOnlyOne;
+        bool blueBrickOnlyOne;
+        bool yellowBrickOnlyOne;
         Scalar red_lower = Scalar(136, 87, 111);
         Scalar red_upper = Scalar(180, 255, 255);
         Scalar green_lower = Scalar(36, 25, 25);
