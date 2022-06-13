@@ -37,30 +37,30 @@ bool unmarshal(U8 *buf, int buf_len);
 void ecrobot_device_initialize()
 {
 #ifndef RUNTIME_CONNECTION
-    ecrobot_init_bt_slave("1234");
+	ecrobot_init_bt_slave("1234");
 #endif
 }
 
 void ecrobot_device_terminate()
 {
-    ecrobot_term_bt_connection();
+	ecrobot_term_bt_connection();
 }
 
 /* LEJOS OSEK hook to be invoked from an ISR in category 2 */
 void user_1ms_isr_type2(void)
 {
-    StatusType ercd;
+	StatusType ercd;
 
-    ercd = SignalCounter(SysTimerCnt); /* Increment OSEK Alarm Counter */
-    if(ercd != E_OK)
-    {
-        ShutdownOS(ercd);
-    }
+	ercd = SignalCounter(SysTimerCnt); /* Increment OSEK Alarm Counter */
+	if(ercd != E_OK)
+	{
+		ShutdownOS(ercd);
+	}
 }
 
 bool verify(U8 msg, U8 checksum) 
 {
-	return msg + checksum == 0 && msg != 0 && checksum != 0;
+	return (msg == ~checksum) == 0 && msg != 0;
 }
 
 bool unmarshal(U8 *buf, int buf_len) 
@@ -85,29 +85,27 @@ bool unmarshal(U8 *buf, int buf_len)
 void marshal(U8* buf, U8 msg_type, U8 msg_payload) 
 {
 	GetResource(BluetoothResource);
-	
+
 	buf[0] = msg_type;
 	buf[2] = ~msg_type;
 
-	if (msg_payload != 0) {
-		buf[1] = msg_payload;
-		buf[3] = ~msg_payload;
-	}
+	buf[1] = msg_payload;
+	buf[3] = ~msg_payload;
 
 	ReleaseResource(BluetoothResource);
 }
 
 TASK(IdleTask) {
-    static SINT bt_status = BT_NO_INIT;
+	static SINT bt_status = BT_NO_INIT;
 	static U8 bt_send_buf[4];
 	static U8 bt_recv_buf[4];
 
-    while(1)
+
+	while(1)
 	{
 #ifdef RUNTIME_CONNECTION
 		ecrobot_init_bt_slave("1234");
 #endif
-
 		if (ecrobot_get_bt_status() == BT_STREAM && bt_status != BT_STREAM) {
 
 			int read = 0;
@@ -131,7 +129,8 @@ TASK(IdleTask) {
 
 				case ACK:
 					// TODO: we can go to the next step, no need to answer to an ack
-					ecrobot_status_monitor("Received Acknowledgement byte!!");
+					display_string("ack byte");
+					display_update();
 					break;
 
 				case DEPLOY_ITEM:
@@ -149,14 +148,15 @@ TASK(IdleTask) {
 			}
 
 			ReleaseResource(BluetoothResource);
-
+			
+			marshal(bt_send_buf, ACK, 0);
 			ecrobot_send_bt(bt_send_buf, 0, 4);
 		}
 
-        bt_status = ecrobot_get_bt_status();
+		bt_status = ecrobot_get_bt_status();
 	}
 
-    TerminateTask();
+	/* TerminateTask(); */
 }
 
 /* IdleTask */
