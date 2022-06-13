@@ -104,7 +104,7 @@
         AUTOSTART = TRUE
         {
           ALARMTIME = 1;
-          CYCLETIME = 100; /* TaskLCD is executed every 100msec */ //TODO CHANGE BACK TO 100
+          CYCLETIME = 10; /* TaskLCD is executed every 100msec */
           APPMODE = appmode1;
         };
       };

@@ -64,6 +64,13 @@ static int BOXES_REMAINING = 0;
  */
 static int CURRENT_BOX = 0;
 
+/**
+ * Current mode of state machine.
+ * 
+ * see modes under #DEFINE
+ */
+static int MODE = CALIBRATE_MOVE_LEFT_TASK;
+
 //-----------------ResourceExecuteCommand-----------------------------------------------------------------
 /**
  * Is the next box, which the robot will go to and drop the stone.
@@ -73,12 +80,7 @@ static int CURRENT_BOX = 0;
 static int NEXT_BOX_TARGET = -1;
 
 
-/**
- *
- * see under #DEFINE
- *
- */
-static int MODE = CALIBRATE_MOVE_LEFT_TASK; //protected by ResourceMode
+
 
 
 
@@ -86,20 +88,22 @@ static int MODE = CALIBRATE_MOVE_LEFT_TASK; //protected by ResourceMode
 /* Standard NXT hooks */
 void ecrobot_device_initialize(void)
 {
-  nxt_motor_set_speed(NXT_PORT_A, 0, 1);
-  nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-  nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+  //set motor speed to 0
+  nxt_motor_set_speed(MOTOR_ASSEMBLY_LINE, 0, 1);
+  nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
+  nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
   
-  ecrobot_set_light_sensor_active(NXT_PORT_S1);
+  ecrobot_set_light_sensor_active(SENSOR_CALIBRATION_STONE);
 }
 
 void ecrobot_device_terminate(void)
 {
-  nxt_motor_set_speed(NXT_PORT_A, 0, 1);
-  nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-  nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-  
-  ecrobot_set_light_sensor_inactive(NXT_PORT_S1);
+  //set motor speed to 0
+  nxt_motor_set_speed(MOTOR_ASSEMBLY_LINE, 0, 1);
+  nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
+  nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
+
+  ecrobot_set_light_sensor_inactive(SENSOR_CALIBRATION_STONE);
 }
 
 void user_1ms_isr_type2(void)
@@ -130,7 +134,7 @@ TASK(EventDispatcherTask)
       
       //calibrate Threshold
       //Poll light data
-      U16 light_data = ecrobot_get_light_sensor(NXT_PORT_S1);
+      U16 light_data = ecrobot_get_light_sensor(SENSOR_CALIBRATION_STONE);
       light_data += 50; //for better threshold
       GetResource(ResourceMainRobot);
       LIGHT_THRESHOLD = light_data;
@@ -154,11 +158,13 @@ TASK(LCDTask)
     display_clear(1);
 
     display_goto_xy(0, 0);
-    display_string("Test");
+    display_string("HELLO");
 
+    GetResource(ResourceMainRobot);
     display_goto_xy(0, 1);
     display_string("LightThres:");
     display_int(LIGHT_THRESHOLD, 4);
+
 
     display_goto_xy(0, 2);
     display_string("Boxesleft:");
@@ -172,19 +178,17 @@ TASK(LCDTask)
     display_string("Mode:");
     display_int(MODE, 1);
 
-    //ReleaseResource(ResourceMainRobot);
-
-    //GetResource(ResourceExecuteCommand);
-    display_goto_xy(0, 5);
-    display_string("NextBox:");
-    display_int(NEXT_BOX_TARGET, 1);
-    //ReleaseResource(ResourceExecuteCommand);
-
-    //GetResource(ResourceMainRobot);
     display_goto_xy(0, 6);
     display_string("CurrentBox:");
     display_int(CURRENT_BOX, 1);
-    //ReleaseResource(ResourceMainRobot);
+    ReleaseResource(ResourceMainRobot);
+
+
+    GetResource(ResourceExecuteCommand);
+    display_goto_xy(0, 5);
+    display_string("NextBox:");
+    display_int(NEXT_BOX_TARGET, 1);
+    ReleaseResource(ResourceExecuteCommand);
 
     static int test_counter = 0;
     display_goto_xy(0, 7);
@@ -219,7 +223,7 @@ TASK(MainTask) {
         switch(MODE) {
           case THROW_STONE_TASK:
             nxt_motor_set_speed(MOTOR_MOVE, 0, 1); //deactive driving
-            movesDegrees(NXT_PORT_A, 360, 100);
+            movesDegrees(MOTOR_ASSEMBLY_LINE, 360, 100);
             
             //GetResource(ResourceMainRobot);
             CURRENT_BOX = NEXT_BOX_TARGET;
@@ -236,12 +240,12 @@ TASK(MainTask) {
           case MOVE_TO_BOX_TASK:
             //Move robot until a calibration stone is found
             if (shouldSetSpeed) {
-              nxt_motor_set_speed(NXT_PORT_B, 100 * DIRECTION, 1);
+              nxt_motor_set_speed(MOTOR_MOVE, 100 * DIRECTION, 1);
               shouldSetSpeed = false;
             }
 
             //Poll light data
-            U16 light_data = ecrobot_get_light_sensor(NXT_PORT_S1);
+            U16 light_data = ecrobot_get_light_sensor(SENSOR_CALIBRATION_STONE);
 
             //GetResource(ResourceMainRobot);
             U16 light_threshold_tmp = LIGHT_THRESHOLD;
@@ -249,7 +253,7 @@ TASK(MainTask) {
 
             if (light_data <= light_threshold_tmp) {
               //stop motor and decrease boxesRemaining
-              nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+              nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
 
               BOXES_REMAINING--;
 
