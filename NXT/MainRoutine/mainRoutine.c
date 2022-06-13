@@ -1,15 +1,10 @@
 /**
- * @file mainRoutine3.c
+ * @file mainRoutine.c
  * @author Luca Jungnickel
- * @brief 
- * @version 0.1
- * @date 2022-05-30
  * 
- * @copyright Copyright (c) 2022
+ * @date 2022-06-13
  * 
  */
-
-/* eds.c */
 #include "kernel.h"
 #include "kernel_id.h"
 #include "ecrobot_interface.h"
@@ -23,8 +18,6 @@ DeclareCounter(SysTimerCnt);
 DeclareTask(EventDispatcherTask);
 DeclareTask(LCDTask);
 DeclareTask(MainTask);
-
-
 
 DeclareResource(ResourceMainRobot);
 DeclareResource(ResourceExecuteCommand);
@@ -51,6 +44,10 @@ DeclareResource(ResourceExecuteCommand);
 
 //---------------ResourceMainRobot-------------------------------------------------------------------
 //global variables:
+/**
+ * Threshold for the light sensor. Could be calibrated in the future, now it's hardcoded.
+ * 
+ */
 static U16 LIGHT_THRESHOLD = 500;
 /**
  * 1 = forward direction (right in direction)
@@ -73,7 +70,7 @@ static int CURRENT_BOX = 0;
  * -1 if currently there is no next box target.
  * 
  */
-static int NEXT_BOX_TARGET = 0;
+static int NEXT_BOX_TARGET = -1;
 
 
 /**
@@ -86,24 +83,25 @@ static int MODE = CALIBRATE_MOVE_LEFT_TASK; //protected by ResourceMode
 
 
 
-/* nxtOSEK hooks */
+/* Standard NXT hooks */
 void ecrobot_device_initialize(void)
 {
   nxt_motor_set_speed(NXT_PORT_A, 0, 1);
   nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+  nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+  
   ecrobot_set_light_sensor_active(NXT_PORT_S1);
-
-
 }
 
 void ecrobot_device_terminate(void)
 {
   nxt_motor_set_speed(NXT_PORT_A, 0, 1);
   nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+  nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+  
   ecrobot_set_light_sensor_inactive(NXT_PORT_S1);
 }
 
-/* nxtOSEK hook to be invoked from an ISR in category 2 */
 void user_1ms_isr_type2(void)
 {
   StatusType ercd;
@@ -113,6 +111,8 @@ void user_1ms_isr_type2(void)
     ShutdownOS(ercd);
   }
 }
+/* End Standard NXT hooks */
+
 
 
 /* EventDispatcher executed every 1ms */
@@ -125,8 +125,9 @@ TASK(EventDispatcherTask)
     
     //middle big button dispatching
     isPressed = ecrobot_is_ENTER_button_pressed();
-    if (isPressed == 1 && !wasPressedLastTick) {
-
+    //prototype of calibrating the light sensor
+    if (isPressed == 1 && !wasPressedLastTick) { //TODO: maybe remove?
+      
       //calibrate Threshold
       //Poll light data
       U16 light_data = ecrobot_get_light_sensor(NXT_PORT_S1);
@@ -151,7 +152,6 @@ TASK(EventDispatcherTask)
 TASK(LCDTask)
 {
     display_clear(1);
-    //GetResource(ResourceMainRobot);
 
     display_goto_xy(0, 0);
     display_string("Test");
@@ -180,11 +180,11 @@ TASK(LCDTask)
     display_int(NEXT_BOX_TARGET, 1);
     //ReleaseResource(ResourceExecuteCommand);
 
-  //  GetResource(ResourceMainRobot);
+    //GetResource(ResourceMainRobot);
     display_goto_xy(0, 6);
     display_string("CurrentBox:");
     display_int(CURRENT_BOX, 1);
-//    ReleaseResource(ResourceMainRobot);
+    //ReleaseResource(ResourceMainRobot);
 
     static int test_counter = 0;
     display_goto_xy(0, 7);
@@ -211,13 +211,14 @@ TASK(MainTask) {
         static bool shouldSetSpeed = true;
         
         //for simulating the raspberry pi
-        static int boxes[] = {2, 3, 1, 3, 0}; //simulate data from raspberry pi
-        static int current_box_index = -1; //-1 is init
-        static int max_box = 5;
-        static bool should_finish = false;
+        static int boxes[] = {2, 3, 1, 3, 0}; //simulate data from raspberry pi TODO remove
+        static int current_box_index = -1; //-1 is init TODO remove
+        static int max_box = 5; //TODO remove maybe
+        static bool should_finish = false; //TODO remove
 
         switch(MODE) {
           case THROW_STONE_TASK:
+            nxt_motor_set_speed(MOTOR_MOVE, 0, 1); //deactive driving
             movesDegrees(NXT_PORT_A, 360, 100);
             
             //GetResource(ResourceMainRobot);
@@ -243,10 +244,10 @@ TASK(MainTask) {
             U16 light_data = ecrobot_get_light_sensor(NXT_PORT_S1);
 
             //GetResource(ResourceMainRobot);
-            U16 light_data_tmp = LIGHT_THRESHOLD;
+            U16 light_threshold_tmp = LIGHT_THRESHOLD;
 
 
-            if (light_data <= light_data_tmp) {
+            if (light_data <= light_threshold_tmp) {
               //stop motor and decrease boxesRemaining
               nxt_motor_set_speed(NXT_PORT_B, 0, 1);
 
@@ -268,7 +269,7 @@ TASK(MainTask) {
           case CALC_NEXT_BOX_POSITION_TASK:
             //calculate next position
             //GetResource(ResourceMainRobot);
-            BOXES_REMAINING = boxes[current_box_index] - CURRENT_BOX; //should work when boxes remaining are positive
+            BOXES_REMAINING = NEXT_BOX_TARGET - CURRENT_BOX; //should work when boxes remaining are positive
             if (BOXES_REMAINING > 0) {
               DIRECTION = 1;
 
@@ -287,10 +288,7 @@ TASK(MainTask) {
               MODE = THROW_STONE_TASK;
             }
             
-            if (should_finish) { //only for simulating PI data, will be removed
 
-              MODE = IDLE_TASK;
-            }
             //ReleaseResource(ResourceMainRobot);
           break;
 
@@ -351,13 +349,19 @@ TASK(MainTask) {
             if (current_box_index >= max_box) {
               current_box_index = -1;
               should_finish = true; //TODO remove
+
             }
             //set next target
             //GetResource(ResourceExecuteCommand);
-            NEXT_BOX_TARGET = boxes[current_box_index]; 
+            //TODO remove !should_finish
+            if (!should_finish) NEXT_BOX_TARGET = boxes[current_box_index]; 
             //ReleaseResource(ResourceExecuteCommand);
 
             MODE = CALC_NEXT_BOX_POSITION_TASK;
+
+            if (should_finish) { //TODO only for simulating PI data, will be removed
+              MODE = IDLE_TASK;
+            }
           break;
 
           case IDLE_TASK:
