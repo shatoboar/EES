@@ -3,22 +3,19 @@
 #include <sys/socket.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
+#include "client.h"
 
-#define MSG_RESEND 255;
-#define ACK 1;
-#define INIT 2;
-#define DEPLOY_SIGNAL 3;
-#define PREDICTED_BUCKET 4;
+#define MSG_RESEND 255
+#define ACK 1
+#define INIT 2
+#define DEPLOY_SIGNAL 3
+#define PREDICTED_BUCKET 4
 
-void printBits(uint8_t num);
-int unmarshal(uint8_t* recv_msg, int bytes_read);
-void marshal(uint8_t* send_buf, uint8_t message_type, uint8_t payload);
 
 int main(int argc, char **argv)
 {
 
 	printf("Starting the program...\n");
-	fflush(stdout);
 	struct sockaddr_rc addr = { 0 };
 	int s, status;
 	char dest[18] = "00:16:53:0F:77:72";
@@ -38,24 +35,17 @@ int main(int argc, char **argv)
 	// send a message
 	if(status == 0) {
 		printf("Connection successful\n");
-		fflush(stdout);
 	}
 
-	//read data from the client
-	int bytes_read;
-	send_buf[0]= 37;
-	send_buf[1]= 49;
-	send_buf[2]= 51;
-	send_buf[3]= 99;
-
-	bytes_read = read(s, recv_buf, sizeof(recv_buf));
-	unmarshal(recv_buf, bytes_read);
 
 	if(status==0){
+		marshal(send_buf, ACK, 0);
 		status = write(s,send_buf, 4);
 		printf("Sent!\n");
 	}
 
+	//read data from the client
+	receive_msg(s, recv_buf);
 
 	if (status < 0) perror("uh oh");
 
@@ -78,10 +68,6 @@ int unmarshal(uint8_t* recv_buf, int bytes_read){
 		printf("Wrong amount of bytes received!\n");
 		return -1;	
 	}
-       	if (recv_buf[0] + recv_buf[2] != 0 || recv_buf[1] + recv_buf[3] != 0){
-	       printf("Checksum Error! \n");
-	       return -1;
-       	}
 	if (bytes_read > 0) {
 		for (int i = 0; i < bytes_read; i++) {
 			printf("[");
@@ -90,6 +76,13 @@ int unmarshal(uint8_t* recv_buf, int bytes_read){
 		}
 		printf("%d\n", bytes_read);    
 	}
+
+       	if (recv_buf[0] != ~recv_buf[2]  || recv_buf[1] != ~recv_buf[3]){
+		printf("%u \n", ~recv_buf[2]);
+		printf("%u \n", ~recv_buf[3]); //TODO figure out why negations don't work
+	       	printf("Checksum Error! \n");
+	       	return -1;
+       	}
 	return recv_buf[0];
 
 }
@@ -102,4 +95,34 @@ void marshal(uint8_t* send_buf, uint8_t message_type, uint8_t payload){
 
 }
 	
+void receive_msg(int socket, uint8_t* recv_buf){
+	int bytes_read;
+	while(bytes_read == 0){
+		bytes_read = read(socket, recv_buf, sizeof(recv_buf));
+		sleep(1);
+	}
+	int msg_type = unmarshal(recv_buf, bytes_read);
+	switch(msg_type){
+		case ACK:
+			printf("ACK received! \n");
+			break;
+		case INIT:
+			printf("Init Signal received! \n");
+			break;
+		case DEPLOY_SIGNAL:
+			printf("Deploy Signal received! \n");
+			break;
+		case PREDICTED_BUCKET:
+			printf("Predicted Bucket received! \n");
+			break;
+		case MSG_RESEND:
+			printf("MSG resend received! \n");
+			break;
+		default:
+			printf("Error while receiving message \n");
+			break;
+	}
+}
+void send_msg(int socket, uint8_t* send_buf, uint8_t message_type, uint8_t payload);
+
 
