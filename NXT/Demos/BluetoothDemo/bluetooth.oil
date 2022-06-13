@@ -18,6 +18,12 @@ CPU ATMEL_AT91SAM7S256
   /* Definition of application mode */
   APPMODE appmode1{}; 
 
+	RESOURCE BluetoothResource 
+	{
+		RESOURCEPROPERTY = STANDARD;
+	};
+
+
   /* Definition of Touch Sensor ON Event */
   EVENT TouchSensorOnEvent{
     MASK = AUTO;

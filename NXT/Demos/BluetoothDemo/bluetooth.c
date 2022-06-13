@@ -12,11 +12,29 @@ DeclareTask(IdleTask);
 DeclareEvent(TouchSensorOnEvent);
 DeclareEvent(TouchSensorOffEvent); 
 
+DeclareResource(BluetoothResource);
+
 /* below macro enables run-time Bluetooth connection */
 #define RUNTIME_CONNECTION
 
-void itoa(int n, char s[]);
-char *reverse(char *str);
+// Message types
+#DEFINE ERROR           255
+#DEFINE ACK             1
+#DEFINE INIT            2
+#DEFINE DEPLOY_ITEM     3
+#DEFINE PREDICTED_BNR   4
+
+/*----------------------------Bluetooth Resources-----------------------------*/
+
+static U8 message_type;
+static U8 message_payload;
+
+/*--------------------------------------------------------*/
+
+
+bool verify(U8 msg, U8 checksum);
+void marshal(U8* buf, U8 msg_type, U8 msg_payload);
+bool unmarshal(U8 *buf, int buf_len);
 
 /* LEJOS OSEK hooks */
 void ecrobot_device_initialize()
@@ -100,44 +118,90 @@ TASK(EventHandler)
     TerminateTask();
 }
 
-char *reverse(char *str)
+bool verify(U8 msg, U8 checksum) 
 {
-    char tmp, *src, *dst;
-    size_t len;
-    if (str != NULL)
-    {
-        len = strlen (str);
-        if (len > 1) {
-            src = str;
-            dst = src + len - 1;
-            while (src < dst) {
-                tmp = *src;
-                *src++ = *dst;
-                *dst-- = tmp;
-            }
-        }
-    }
-    return str;
+	return msg + checksum == 0 && msg != 0 && checksum != 0;
 }
 
-void itoa(int n, char s[]) 
+bool unmarshal(U8 *buf, int buf_len) 
 {
-    int i, sign;
+	GetResource(BluetoothResource);
 
-    if ((sign = n) < 0)        /* record sign */
-        n = -n;                /* make n positive */
-    i = 0;
+	message_type = buf[0];	
+	if (!verify(message_type, buf[2])) 
+		return false; 
 
-    do {                       /* generate digits in reverse order */
-        s[i++] = n % 10 + '0'; /* get next digit */
-    } while ((n /= 10) > 0);   /* delete it */
+	message_payload = buf[1];
+	if (!verify(message_payload, buf[3]))
+		return false; 
+	
+	ReleaseResource(BluetoothResource);
+}
 
-    if (sign < 0)
-        s[i++] = '-';
+// Beware of the case that the messages being sent could be 0
+void marshal(U8* buf, U8 msg_type, U8 msg_payload) 
+{
+	GetResource(BluetoothResource);
+	
+	buf[0] = msg_type;
+	buf[2] = ~msg_type;
 
-    reverse(s);
-    s[i] = '\0';
-    return;
+	if msg_payload != 0 {
+		buf[1] = msg_payload;
+		buf[3] = ~msg_payload;
+	}
+
+	ReleaseResource(BluetoothResource);
+}
+
+TASK(PollTask) {
+	static U8 bt_send_buf[4];
+	static U8 bt_recv_buf[4];
+
+    while(1)
+    {
+#ifdef RUNTIME_CONNECTION
+        ecrobot_init_bt_slave("1234");
+#endif
+
+		int read = 0;
+		while(read == 0){
+			 read = ecrobot_read_bt(bt_recv_buf, 0, 4);
+			 systick_wait_ms(500);
+		}
+
+		bool ok = unmarshal(bt_recv_buf, read);
+		if (!ok) {
+			marshal(bt_send_buf, ERROR, 0);
+			ecrobot_send_bt(bt_send_buf, 0, 4);
+		} 
+
+		GetResource(BluetoothResource);
+
+		switch (message_type) {
+		case ERROR:
+		// TODO: we need to repeat the last sent message
+
+		case ACK:
+		// TODO: we can go to the next step, no need to answer to an ack
+
+		case DEPLOY_ITEM:
+		// TODO: we need to deploy the item from the dispenser
+
+		case PREDICTED_BNR:
+		// TODO: sort in the item into the respective bucketnumber
+
+		case default: 
+		// TODO: default case is weird af
+
+		}
+
+		ReleaseResource(BluetoothResource);
+
+		ecrobot_send_bt(bt_send_buf, 0, 4);
+    }
+
+    TerminateTask();
 }
 
 /* IdleTask */
@@ -155,40 +219,16 @@ TASK(IdleTask)
 
         if (ecrobot_get_bt_status() == BT_STREAM && bt_status != BT_STREAM)
         {
-            display_clear(0);
-            display_goto_xy(0, 0);
-            display_string("[BT] \n");
-            display_update();
-
             bt_send_buf[0] = 13;
             bt_send_buf[1] = 27; 
-            /* for (int i = 0; i < 32; i++) { */
-            /*     bt_send_buf[i] = 1; */ /* } */
 
             ecrobot_send_bt(bt_send_buf, 0, 4);
-            /* display_string("Sent message\n"); */
-            /* display_unsigned(bt_send_buf[0], 2); */
-            /* display_string("\n"); */
-            /* display_update(); */
 
             int read = 0;
             while(read == 0){
                  read = ecrobot_read_bt(bt_receive_buf, 0, 4);
-                 systick_wait_ms(2000);
+                 systick_wait_ms(500);
             }
-            
-            display_unsigned(read, 2);
-            display_string("\n");
-            display_string("Received message\n");
-            display_unsigned(bt_receive_buf[0], 2);
-            display_string("\n");
-            display_unsigned(bt_receive_buf[1], 2);
-            display_string("\n");
-            display_unsigned(bt_receive_buf[2], 2);
-            display_string("\n");
-            display_unsigned(bt_receive_buf[3], 2);
-            display_string("\n");
-            display_update();
 
         }
         bt_status = ecrobot_get_bt_status();
