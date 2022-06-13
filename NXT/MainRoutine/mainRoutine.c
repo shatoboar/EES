@@ -30,14 +30,15 @@ DeclareResource(ResourceMainRobot);
 DeclareResource(ResourceExecuteCommand);
 
 
-#define THROW_STONE_TASK         0
-#define MOVE_TO_BOX_TASK         1
-#define TMP_MOVE_TASK            2
-#define READY_FOR_STONE_TASK     3
-#define THROW_STONE_ON_LINE_TASK 4
-#define TAKE_PICTURE_TASK        5
-#define CALIBRATE_MOVE_LEFT_TASK 6
-#define IDLE_TASK                7
+#define THROW_STONE_TASK            0
+#define MOVE_TO_BOX_TASK            1
+#define TMP_MOVE_TASK               2
+#define READY_FOR_STONE_TASK        3
+#define CALC_NEXT_BOX_POSITION_TASK 4
+#define THROW_STONE_ON_LINE_TASK    5
+#define TAKE_PICTURE_TASK           6
+#define CALIBRATE_MOVE_LEFT_TASK    7
+#define IDLE_TASK                   8
 
 #define MOTOR_ASSEMBLY_LINE         NXT_PORT_A
 #define MOTOR_MOVE                  NXT_PORT_B
@@ -73,23 +74,12 @@ static int CURRENT_BOX = 0;
  * 
  */
 static int NEXT_BOX_TARGET = 0;
-//----------------------------------------------------------------------------------
-static bool SHOULD_SEND_MESSAGE = false;
-static int MESSAGE_SEND_TYPE = -1;
-static int MESSAGE_SEND_PAYLOAD = -1;
 
-static bool MESSAGE_RECEIVED = false;
-static int MESSAGE_RECEIVE_TYPE = -1;
 
 /**
- *  0: ThrowStone
- *  1: MoveToBox
- *  2: TmpMove
- *  3: ReadyForStone
- *  4: ThrowStoneOnLine
- *  5: TakePicture
- *  6: IDLE
- *  7: CalibrateMoveLeft
+ *
+ * see under #DEFINE
+ *
  */
 static int MODE = CALIBRATE_MOVE_LEFT_TASK; //protected by ResourceMode
 
@@ -129,13 +119,8 @@ void user_1ms_isr_type2(void)
 TASK(EventDispatcherTask)
 {
     U8 isPressed = 0;
-    U8 isPressedRight = 0;
 
     static bool wasPressedLastTick = false;
-    static bool wasPressedRightLastTick = false;
-
-    static bool isOnStartup = true;
-
 
     
     //middle big button dispatching
@@ -177,7 +162,7 @@ TASK(LCDTask)
 
     display_goto_xy(0, 2);
     display_string("Boxesleft:");
-    display_int(BOXES_REMAINING, 1);
+    display_int(BOXES_REMAINING, 2);
 
     display_goto_xy(0, 3);
     display_string("Direction:");
@@ -203,7 +188,7 @@ TASK(LCDTask)
 
     static int test_counter = 0;
     display_goto_xy(0, 7);
-    display_string("Tmp Counter:");
+    display_string("Test Counter:");
     display_unsigned(test_counter, 5);    
     test_counter++;
 
@@ -220,7 +205,6 @@ TASK(MainTask) {
       while (1)
       {
         /**
-         * Should be set to True if MOVE_TO_BOX_TASK, TMP_MOVE_TASK, CALIBRATION_LEFT_STONE is entered.
          * Sets the speed again.
          * Helper guard, so the motor won't be set every tick
          */
@@ -277,35 +261,11 @@ TASK(MainTask) {
             
             }
             //ReleaseResource(ResourceMainRobot);
-
           break;
 
 
-          case TMP_MOVE_TASK:
-            if (shouldSetSpeed) {     
-              movesDegrees(MOTOR_MOVE, 270, 95 * DIRECTION);
-              shouldSetSpeed = false;
-            }
 
-            shouldSetSpeed = true;
-            //GetResource(ResourceMainRobot);
-            MODE = MOVE_TO_BOX_TASK;
-           // ReleaseResource(ResourceMainRobot);
-          break;
-          
-
-          case READY_FOR_STONE_TASK:
-            
-            current_box_index++; //current_box_index is only for simulating PI data and will be removed later
-            if (current_box_index >= max_box) {
-              current_box_index = -1;
-              should_finish = true; //TODO remove
-            }
-            //set next target
-            //GetResource(ResourceExecuteCommand);
-            NEXT_BOX_TARGET = boxes[current_box_index]; 
-            //ReleaseResource(ResourceExecuteCommand);
-
+          case CALC_NEXT_BOX_POSITION_TASK:
             //calculate next position
             //GetResource(ResourceMainRobot);
             BOXES_REMAINING = boxes[current_box_index] - CURRENT_BOX; //should work when boxes remaining are positive
@@ -331,8 +291,35 @@ TASK(MainTask) {
 
               MODE = IDLE_TASK;
             }
-
             //ReleaseResource(ResourceMainRobot);
+          break;
+
+
+
+          case TMP_MOVE_TASK:
+            if (shouldSetSpeed) {     
+              movesDegrees(MOTOR_MOVE, 270, 95 * DIRECTION);
+              shouldSetSpeed = false;
+            }
+
+            shouldSetSpeed = true;
+            //GetResource(ResourceMainRobot);
+            MODE = MOVE_TO_BOX_TASK;
+           // ReleaseResource(ResourceMainRobot);
+          break;
+          
+
+          case READY_FOR_STONE_TASK:
+            
+            //set motor speed to 0
+            nxt_motor_set_speed(MOTOR_ASSEMBLY_LINE, 0, 1);
+            nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
+            nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
+
+            //TO DO wait until next stone signal from bluetooth module is coming
+
+            //Throw stone the assembly line
+            MODE = THROW_STONE_ON_LINE_TASK;
           break;
 
           case CALIBRATE_MOVE_LEFT_TASK:
@@ -344,6 +331,33 @@ TASK(MainTask) {
               nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
               MODE = READY_FOR_STONE_TASK;
             }
+          break;
+
+          case THROW_STONE_ON_LINE_TASK:
+            //move dispenser and drop stone
+            movesDegrees(MOTOR_DISPENSER, 360, 100);
+            
+            //TODO: Send signal to PI to send picture
+            
+            MODE = TAKE_PICTURE_TASK;
+          break;
+
+          case TAKE_PICTURE_TASK:
+            
+            //TODO wait until signal from PI for correct box info
+            
+            //MOCK SIMULATION
+            current_box_index++; //current_box_index is only for simulating PI data and will be removed later
+            if (current_box_index >= max_box) {
+              current_box_index = -1;
+              should_finish = true; //TODO remove
+            }
+            //set next target
+            //GetResource(ResourceExecuteCommand);
+            NEXT_BOX_TARGET = boxes[current_box_index]; 
+            //ReleaseResource(ResourceExecuteCommand);
+
+            MODE = CALC_NEXT_BOX_POSITION_TASK;
           break;
 
           case IDLE_TASK:

@@ -23,10 +23,10 @@
  * @return int The additional degrees the motor was moved
  */
 int movesDegrees(U32 motor_port, int degrees, int speed) {
+    if (speed == 0) return 0;
 
     int motor_count = 0;
     nxt_motor_set_count(motor_port, 0);
-    int offset = nxt_motor_get_count(motor_port);
 
     motor_count = nxt_motor_get_count(motor_port);
     nxt_motor_set_speed(motor_port, speed, 1);
