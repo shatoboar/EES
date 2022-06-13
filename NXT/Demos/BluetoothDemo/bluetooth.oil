@@ -18,46 +18,11 @@ CPU ATMEL_AT91SAM7S256
   /* Definition of application mode */
   APPMODE appmode1{}; 
 
-	RESOURCE BluetoothResource 
-	{
-		RESOURCEPROPERTY = STANDARD;
-	};
-
-
-  /* Definition of Touch Sensor ON Event */
-  EVENT TouchSensorOnEvent{
-    MASK = AUTO;
-  };
-
-  /* Definition of Touch Sensor OFF Event */
-  EVENT TouchSensorOffEvent{
-    MASK = AUTO;
-  };
-
-  /* Definition of EventDispatcher */
-  TASK EventDispatcher
+  RESOURCE BluetoothResource 
   {
-    AUTOSTART = FALSE;
-    PRIORITY = 3;
-    ACTIVATION = 1;
-    SCHEDULE = FULL;
-    STACKSIZE = 512; /* Stack size */ 
+  	RESOURCEPROPERTY = STANDARD;
   };
 
-  /* Definition of EventHandler */
-  TASK EventHandler
-  {
-    AUTOSTART = TRUE
-    {
-      APPMODE = appmode1;
-    };
-    PRIORITY = 2;
-    ACTIVATION = 1;
-    SCHEDULE = FULL;
-    STACKSIZE = 512; /* Stack size */
-    EVENT = TouchSensorOnEvent;
-    EVENT = TouchSensorOffEvent; 
-  };
 
   /* Definition of IdleTask */
   TASK IdleTask
@@ -70,6 +35,8 @@ CPU ATMEL_AT91SAM7S256
     ACTIVATION = 1;
     SCHEDULE = FULL;
     STACKSIZE = 512; /* Stack size */ 
+
+	RESOURCE = BluetoothResource;
   };
 
   /* Definition of OSEK Alarm Counter */
@@ -80,19 +47,4 @@ CPU ATMEL_AT91SAM7S256
     TICKSPERBASE = 1; /* One tick is equal to 1msec */ 
   };
 
-  /* Definition of EventDispatcher execution timing */
-  ALARM cyclic_alarm1
-  {
-    COUNTER = SysTimerCnt;
-    ACTION = ACTIVATETASK
-    {
-        TASK = EventDispatcher;
-    };
-    AUTOSTART = TRUE
-    {
-        ALARMTIME = 1;
-        CYCLETIME = 5; /* Executed every 5msec */
-        APPMODE = appmode1;
-    };
-  };
 };
