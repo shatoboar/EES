@@ -22,16 +22,29 @@ DeclareTask(MainTask);
 DeclareResource(ResourceMainRobot);
 DeclareResource(ResourceExecuteCommand);
 
-
-#define THROW_STONE_TASK            0
-#define MOVE_TO_BOX_TASK            1
-#define TMP_MOVE_TASK               2
-#define READY_FOR_STONE_TASK        3
-#define CALC_NEXT_BOX_POSITION_TASK 4
-#define THROW_STONE_ON_LINE_TASK    5
-#define TAKE_PICTURE_TASK           6
-#define CALIBRATE_MOVE_LEFT_TASK    7
-#define IDLE_TASK                   8
+#define RESET_TASK                            0
+#define THROW_STONE_TASK                      1
+#define MOVE_TO_BOX_TASK                      2
+#define TMP_MOVE_TASK                         3
+#define READY_FOR_STONE_TASK                  4
+#define CALC_NEXT_BOX_POSITION_TASK           5
+#define THROW_STONE_ON_LINE_TASK              6
+#define TAKE_PICTURE_TASK                     7
+#define CALIBRATE_MOVE_LEFT_TASK              8
+#define ERROR_LIGHT                           9
+/**
+ * Starts the error correction calibrate phase.
+ * The robot will drive to the right side until a bumber stone was hit, the to the left and count the stones.
+ * If the number of counted calibration stones are correct and the left bumber stone was hit, everything is ok again.
+ * Timeout of 4s in which a calibration has to be found, otherwise it will go into the ERROR_FATAL state.
+ */
+#define ERROR_CORRECTION_CALIBRATE_START            10  
+#define ERROR_CORRECTION_CALIBRATE_RIGHT            11 //entered after error_correction_calibrate_start, will enter _calibrate_left
+#define ERROR_CORRECTION_CALIBRATE_LEFT             12 //drives to the left and counts the stones
+#define ERROR_CORRECTION_CALIBRATE_LEFT_TMP         13 //tmp move if a calibration stone was detected
+#define ERROR_CORRECTION_CALIBRATE_LEFT_STONE_BUMP  14 //stones counted are correct, now a left bumber stone is expected
+#define ERROR_FATAL                                 15
+#define IDLE_TASK                                   16
 
 #define MOTOR_ASSEMBLY_LINE         NXT_PORT_A
 #define MOTOR_MOVE                  NXT_PORT_B
@@ -40,6 +53,7 @@ DeclareResource(ResourceExecuteCommand);
 #define SENSOR_TOUCH_RIGHT          NXT_PORT_S2
 #define SENSOR_TOUCH_LEFT           NXT_PORT_S3
 
+#define DEGREES_DISPENSER           250
 
 
 //---------------ResourceMainRobot-------------------------------------------------------------------
@@ -65,11 +79,31 @@ static int BOXES_REMAINING = 0;
 static int CURRENT_BOX = 0;
 
 /**
+ *  Number of boxes on the line. Now hardcoded, could be counted in the future by the robot
+ */
+static int NUMBER_OF_BOXES = 4;
+/**
+ * 
+ * FLAG, if a touch sensor is activated and should be touched in the next time.
+ * Important for safety requirements, if a touch sensor is touched while not being activated an error will be thrown.
+ */
+static bool TOUCH_SENSOR_LEFT_ACTIVATED = false;
+static bool TOUCH_SENSOR_RIGHT_ACTIVATED = false;
+
+/**
+ * Counter for counting boxes if robot is in error state.
+ * 
+ */
+static int ERROR_COUNTED_BOXES = 0;
+
+static bool IS_IN_ERROR_MODE = false;
+
+/**
  * Current mode of state machine.
  * 
  * see modes under #DEFINE
  */
-static int MODE = CALIBRATE_MOVE_LEFT_TASK;
+static int MODE = RESET_TASK;
 
 //-----------------ResourceExecuteCommand-----------------------------------------------------------------
 /**
@@ -162,8 +196,8 @@ TASK(LCDTask)
 
     GetResource(ResourceMainRobot);
     display_goto_xy(0, 1);
-    display_string("LightThres:");
-    display_int(LIGHT_THRESHOLD, 4);
+    display_string("ERRORcBoxes:");
+    display_int(ERROR_COUNTED_BOXES, 4);
 
 
     display_goto_xy(0, 2);
@@ -196,6 +230,8 @@ TASK(LCDTask)
     display_unsigned(test_counter, 5);    
     test_counter++;
 
+
+
     display_update();
     
 
@@ -221,23 +257,31 @@ TASK(MainTask) {
         static bool should_finish = false; //TODO remove
 
         switch(MODE) {
+          case RESET_TASK:
+            movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, -70); //reset pusher to idle
+            MODE = CALIBRATE_MOVE_LEFT_TASK;
+          break;
           case THROW_STONE_TASK:
             nxt_motor_set_speed(MOTOR_MOVE, 0, 1); //deactive driving
-            movesDegrees(MOTOR_ASSEMBLY_LINE, 360, 100);
             
-            //GetResource(ResourceMainRobot);
-            CURRENT_BOX = NEXT_BOX_TARGET;
-            //ReleaseResource(ResourceMainRobot);
+            movesDegrees(MOTOR_ASSEMBLY_LINE, 350, 100);
 
-            //GetResource(ResourceExecuteCommand);
+            GetResource(ResourceExecuteCommand);
+            GetResource(ResourceMainRobot);
+            CURRENT_BOX = NEXT_BOX_TARGET;
+            ReleaseResource(ResourceMainRobot);
+
             NEXT_BOX_TARGET = -1;
-            //ReleaseResource(ResourceExecuteCommand);
+            ReleaseResource(ResourceExecuteCommand);
 
             MODE = READY_FOR_STONE_TASK;
           break;
 
 
           case MOVE_TO_BOX_TASK:
+            
+            GetResource(ResourceMainRobot);
+
             //Move robot until a calibration stone is found
             if (shouldSetSpeed) {
               nxt_motor_set_speed(MOTOR_MOVE, 100 * DIRECTION, 1);
@@ -249,7 +293,6 @@ TASK(MainTask) {
 
             //GetResource(ResourceMainRobot);
             U16 light_threshold_tmp = LIGHT_THRESHOLD;
-
 
             if (light_data <= light_threshold_tmp) {
               //stop motor and decrease boxesRemaining
@@ -265,14 +308,16 @@ TASK(MainTask) {
               }
             
             }
-            //ReleaseResource(ResourceMainRobot);
+            ReleaseResource(ResourceMainRobot);
           break;
 
 
 
           case CALC_NEXT_BOX_POSITION_TASK:
             //calculate next position
-            //GetResource(ResourceMainRobot);
+            GetResource(ResourceMainRobot);
+            GetResource(ResourceExecuteCommand);
+
             BOXES_REMAINING = NEXT_BOX_TARGET - CURRENT_BOX; //should work when boxes remaining are positive
             if (BOXES_REMAINING > 0) {
               DIRECTION = 1;
@@ -292,27 +337,26 @@ TASK(MainTask) {
               MODE = THROW_STONE_TASK;
             }
             
-
-            //ReleaseResource(ResourceMainRobot);
+            ReleaseResource(ResourceMainRobot);
+            ReleaseResource(ResourceExecuteCommand);
           break;
 
 
 
           case TMP_MOVE_TASK:
+
             if (shouldSetSpeed) {     
               movesDegrees(MOTOR_MOVE, 270, 95 * DIRECTION);
               shouldSetSpeed = false;
             }
 
             shouldSetSpeed = true;
-            //GetResource(ResourceMainRobot);
             MODE = MOVE_TO_BOX_TASK;
-           // ReleaseResource(ResourceMainRobot);
           break;
           
 
           case READY_FOR_STONE_TASK:
-            
+
             //set motor speed to 0
             nxt_motor_set_speed(MOTOR_ASSEMBLY_LINE, 0, 1);
             nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
@@ -325,22 +369,28 @@ TASK(MainTask) {
           break;
 
           case CALIBRATE_MOVE_LEFT_TASK:
+            
+            TOUCH_SENSOR_LEFT_ACTIVATED = true;
+            
+
             if (shouldSetSpeed == true) {
               nxt_motor_set_speed(MOTOR_MOVE, -100, 1);
               shouldSetSpeed = false;
             }
             if (ecrobot_get_touch_sensor(SENSOR_TOUCH_LEFT)) {
-              nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
+              //nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
+              movesDegrees(MOTOR_MOVE, 180, 100);
+              TOUCH_SENSOR_LEFT_ACTIVATED = false;
               MODE = READY_FOR_STONE_TASK;
             }
           break;
 
           case THROW_STONE_ON_LINE_TASK:
             //move dispenser and drop stone
-            movesDegrees(MOTOR_DISPENSER, 360, 100);
+            movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, 85); //push
+            movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, -85); //and retreat
             
             //TODO: Send signal to PI to send picture
-            
             MODE = TAKE_PICTURE_TASK;
           break;
 
@@ -353,13 +403,12 @@ TASK(MainTask) {
             if (current_box_index >= max_box) {
               current_box_index = -1;
               should_finish = true; //TODO remove
-
             }
             //set next target
-            //GetResource(ResourceExecuteCommand);
+            GetResource(ResourceExecuteCommand);
             //TODO remove !should_finish
             if (!should_finish) NEXT_BOX_TARGET = boxes[current_box_index]; 
-            //ReleaseResource(ResourceExecuteCommand);
+            ReleaseResource(ResourceExecuteCommand);
 
             MODE = CALC_NEXT_BOX_POSITION_TASK;
 
@@ -368,11 +417,135 @@ TASK(MainTask) {
             }
           break;
 
+
+          //------------------------------------ERROR HANDLING------------------------------------
+          case ERROR_LIGHT:
+            IS_IN_ERROR_MODE = true;
+            MODE = ERROR_CORRECTION_CALIBRATE_START;
+          break;
+
+          case ERROR_CORRECTION_CALIBRATE_START:
+            //try to calibrate again with 10 seconds timeout
+            //drive to the right until the bumber stone is hit, then drive to the left and count the stones
+            
+            //reset
+            nxt_motor_set_speed(MOTOR_ASSEMBLY_LINE, 0, 1);
+            nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
+            nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
+            ERROR_COUNTED_BOXES = 0;
+
+            //drive to the right
+            movesDegrees(MOTOR_MOVE, 90, 100); //a little bit outside of the touch sensor
+            nxt_motor_set_speed(MOTOR_MOVE, 100, 1);
+
+            MODE = ERROR_CORRECTION_CALIBRATE_RIGHT;
+          break;
+
+          case ERROR_CORRECTION_CALIBRATE_RIGHT:
+            //wait until the right bumber stone is hit
+            if (ecrobot_get_touch_sensor(SENSOR_TOUCH_RIGHT)) {
+              //start counting boxes
+
+              U16 data = ecrobot_get_light_sensor(SENSOR_CALIBRATION_STONE);
+              if (data <= LIGHT_THRESHOLD) { //over a stone
+                MODE = ERROR_CORRECTION_CALIBRATE_LEFT_TMP;
+                ERROR_COUNTED_BOXES++;
+              } else { //not over a stone
+                MODE = ERROR_CORRECTION_CALIBRATE_LEFT;
+              }
+
+              //drive to the left
+              movesDegrees(MOTOR_MOVE, 90, -100);
+              nxt_motor_set_speed(MOTOR_MOVE, -100, 1);
+            }
+            
+          break;
+
+          case ERROR_CORRECTION_CALIBRATE_LEFT:
+            if (ERROR_COUNTED_BOXES == NUMBER_OF_BOXES) {
+              nxt_motor_set_speed(MOTOR_MOVE, -100, 1); //drive to left
+              MODE = ERROR_CORRECTION_CALIBRATE_LEFT_STONE_BUMP;
+            } else {
+              U16 light = ecrobot_get_light_sensor(SENSOR_CALIBRATION_STONE);
+              U8 touchedLeft = ecrobot_get_touch_sensor(SENSOR_TOUCH_LEFT);
+              U8 touchedRight = ecrobot_get_touch_sensor(SENSOR_TOUCH_RIGHT);
+              if (!touchedLeft && !touchedRight) {
+                if (light <= LIGHT_THRESHOLD) { //over a stone
+                  MODE = ERROR_CORRECTION_CALIBRATE_LEFT_TMP;
+                  ERROR_COUNTED_BOXES++;
+                } else { //not over a stone
+                  
+                }
+              } else { //touched, error happened
+                MODE = ERROR_FATAL;
+              }
+            }
+          break;
+
+          case ERROR_CORRECTION_CALIBRATE_LEFT_TMP:
+            if (ERROR_COUNTED_BOXES == NUMBER_OF_BOXES) {
+              movesDegrees(MOTOR_MOVE, 270, -95); //get outside the calibration stone area
+
+              MODE = ERROR_CORRECTION_CALIBRATE_LEFT_STONE_BUMP;
+            } else {
+              U8 touchedLeft = ecrobot_get_touch_sensor(SENSOR_TOUCH_LEFT);
+              U8 touchedRight = ecrobot_get_touch_sensor(SENSOR_TOUCH_RIGHT);
+              if (!touchedLeft && !touchedRight) {
+                //get outside the calibration stone area
+                movesDegrees(MOTOR_MOVE, 270, -95);
+                nxt_motor_set_speed(MOTOR_MOVE, -100, 1); //drive to left
+                MODE = ERROR_CORRECTION_CALIBRATE_LEFT; //back to normal counting mode
+              } else {
+                MODE = ERROR_FATAL;
+              }
+            }
+          break;
+
+          case ERROR_CORRECTION_CALIBRATE_LEFT_STONE_BUMP:
+            //robot is still driving from other states
+            //expecting to get a bumber stone hit and not a calibration stone again
+                        //Poll light data
+            MODE = ERROR_CORRECTION_CALIBRATE_LEFT_STONE_BUMP; //no meaning behind it. Otherwise the code will not compile, because a case shouldn't be followed by U16 statement.....
+
+            U16 light_data2 = ecrobot_get_light_sensor(SENSOR_CALIBRATION_STONE);
+            if (light_data2 <= LIGHT_THRESHOLD) { //over a stone
+              MODE = ERROR_FATAL; //throw fatal error
+            } else {
+              if (ecrobot_get_touch_sensor(SENSOR_TOUCH_LEFT)) {
+                nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
+                movesDegrees(MOTOR_MOVE, 90, 100); //a little bit to the right
+                TOUCH_SENSOR_LEFT_ACTIVATED = false;
+                IS_IN_ERROR_MODE = false;
+                MODE = READY_FOR_STONE_TASK; //then everything is fine again
+              }
+            }
+          break;
+
+
+          case ERROR_FATAL:
+            nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
+            nxt_motor_set_speed(MOTOR_ASSEMBLY_LINE, 0, 1);
+            nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
+            MODE = ERROR_FATAL;
+          break;
+
           case IDLE_TASK:
             nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
             nxt_motor_set_speed(MOTOR_ASSEMBLY_LINE, 0, 1);
+            nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
           break;
         }
+        //this code is always executed:
+
+        //check if touch sensor is touched invalidly
+        if (!IS_IN_ERROR_MODE) {
+          if (ecrobot_get_touch_sensor(SENSOR_TOUCH_LEFT) && !TOUCH_SENSOR_LEFT_ACTIVATED) {
+            MODE = ERROR_LIGHT;
+          } else if (ecrobot_get_touch_sensor(SENSOR_TOUCH_RIGHT) && ! TOUCH_SENSOR_RIGHT_ACTIVATED) {
+            MODE = ERROR_LIGHT;
+          }
+        }
+
       }
 
       TerminateTask();
