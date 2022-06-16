@@ -14,21 +14,32 @@
 using namespace std;
 using namespace cv;
 
+
+typedef enum class Color
+{red, green, blue, yellow
+}Color;
+
+typedef enum class Color_detected
+{
+    red, green, blue, yellow, no_object, several_colors
+}Color_detected;
+
 class ColorDetection {
 public:
         Mat img;
-        vector<Point> redCounter;
-        vector<Point> greenCounter;
-        vector<Point> blueCounter;
-        vector<Point> yellowCounter;
-        bool redBrick = false;
-        bool greenBrick = false;
-        bool blueBrick = false;
-        bool yellowBrick = false;
-        bool redBrickOnlyOne;
-        bool greenBrickOnlyOne;
-        bool blueBrickOnlyOne;
-        bool yellowBrickOnlyOne;
+        vector<Point> red_counter;
+        vector<Point> green_counter;
+        vector<Point> blue_counter;
+        vector<Point> yellow_counter;
+        bool red_brick = false;
+        bool green_brick = false;
+        bool blue_brick = false;
+        bool yellow_brick = false;
+        bool red_brick_only_one;
+        bool green_brick_only_one;
+        bool blue_brick_only_one;
+        bool yellow_brick_only_one;
+        Color_detected color_detection_result;
         Scalar red_lower = Scalar(136, 87, 111);
         Scalar red_upper = Scalar(180, 255, 255);
         Scalar green_lower = Scalar(36, 25, 25);
@@ -38,11 +49,10 @@ public:
         Scalar yellow_lower = Scalar(15, 100, 100);
         Scalar yellow_upper = Scalar(30, 255, 255);
         ColorDetection(char* filename);
-        vector<Point> getRedCounter();
-        vector<Point> getGreenCounter();
-        vector<Point> getBlueCounter();
-        vector<Point> getYellowCounter();
+        vector<Point> get_red_counter();
+        vector<Point> get_green_counter();
+        vector<Point> get_blue_counter();
+        vector<Point> get_yellow_counter();
 };
-
 
 #endif //EES_COLORDETECTION_H
