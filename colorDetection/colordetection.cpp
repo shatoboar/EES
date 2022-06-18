@@ -1,9 +1,6 @@
-//
-// Created by tristan on 05.06.22.
-//
 #include <colordetection.h>
-#include <../Controller/controller.h>
 #include <iostream>
+#include <string.h>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -12,24 +9,24 @@
 using namespace std;
 using namespace cv;
 
-vector<Point> ColorDetection::getRedCounter() {
-    return redCounter;
+vector<Point> ColorDetection::get_red_counter() {
+    return red_counter;
 }
 
-vector<Point> ColorDetection::getGreenCounter() {
-    return greenCounter;
+vector<Point> ColorDetection::get_green_counter() {
+    return green_counter;
 }
 
-vector<Point> ColorDetection::getBlueCounter() {
-    return blueCounter;
+vector<Point> ColorDetection::get_blue_counter() {
+    return blue_counter;
 }
 
-vector<Point> ColorDetection::getYellowCounter() {
-    return yellowCounter;
+vector<Point> ColorDetection::get_yellow_counter() {
+    return yellow_counter;
 }
 
 //int colour represents the colour of objects that are searched for, o=red, 1=green, 2=blue, 3=yellow
-vector<Point> detect_max_color(Mat mask, int colour, ColorDetection *c) {
+vector<Point> detect_max_color(Mat mask, Color search_color, ColorDetection *c) {
     int max_area = 0;
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
@@ -42,40 +39,44 @@ vector<Point> detect_max_color(Mat mask, int colour, ColorDetection *c) {
         if (area > 20000) {
             object_counter++;
             if(area> max_area)
-            large_contour = contours[i];
+                large_contour = contours[i];
             max_area = area;
         }
     }
-
     if(object_counter > 0){
-        if(colour == 0){
-            c->redBrick = true;
-            if(object_counter > 1){
-                c->redBrickOnlyOne = false;
-            }else{
-                c->redBrickOnlyOne = true;
-            }
-        }else if(colour == 1){
-            c->greenBrick = true;
-            if(object_counter > 1){
-                c->greenBrickOnlyOne = false;
-            }else{
-                c->greenBrickOnlyOne = true;
-            }
-        }else if(colour == 2){
-            c->blueBrick = true;
-            if(object_counter > 1){
-                c->blueBrickOnlyOne = false;
-            }else{
-                c->blueBrickOnlyOne = true;
-            }
-        }else if(colour == 3){
-            c->yellowBrick = true;
-            if(object_counter > 1){
-                c->yellowBrickOnlyOne = false;
-            }else{
-                c->yellowBrickOnlyOne = true;
-            }
+        switch(search_color){
+            case Color::red:
+                c->red_brick = true;
+                if(object_counter > 1){
+                    c->red_brick_only_one = false;
+                }else{
+                    c->red_brick_only_one = true;
+                }
+                break;
+            case Color::green:
+                c->green_brick = true;
+                if(object_counter > 1){
+                    c->green_brick_only_one = false;
+                }else{
+                    c->green_brick_only_one = true;
+                }
+                break;
+            case Color::blue:
+                c->blue_brick = true;
+                if(object_counter > 1){
+                    c->blue_brick_only_one = false;
+                }else{
+                    c->blue_brick_only_one = true;
+                }
+                break;
+            case Color::yellow:
+                c->yellow_brick = true;
+                if(object_counter > 1){
+                    c->yellow_brick_only_one = false;
+                }else{
+                    c->yellow_brick_only_one = true;
+                }
+                break;
         }
     }
 
@@ -89,7 +90,7 @@ void box_creator(Mat img, vector<Point> contour, int r, int g, int b, string nam
     putText(img, name, contour[0], FONT_ITALIC, 0.8, Scalar (139, 35, 35));
 }
 
-void show(Mat img, vector<Point> red, vector<Point> green, vector<Point> blue, vector<Point> yellow, ColorDetection newDetection) {
+void show(Mat img, vector<Point> red, vector<Point> green, vector<Point> blue, vector<Point> yellow, ColorDetection new_detection) {
     if (red.size() > 0) {
         box_creator(img, red, 0, 0, 255, "Red Colour");
     }
@@ -103,29 +104,9 @@ void show(Mat img, vector<Point> red, vector<Point> green, vector<Point> blue, v
         box_creator(img, yellow, 255, 255, 255, "Yellow Colour");
     }
     namedWindow("TEST", WINDOW_NORMAL);
-    imshow("teST", newDetection.img);
+    imshow("teST", img);
     waitKey(12000);
     destroyAllWindows();
-}
-
-bool ColorDetection::onlyOneColor() {
-    if(redBrick != greenBrick != blueBrick != yellowBrick){
-        return true;
-    }
-
-    return false;
-}
-
-Color ColorDetection::returnColor() {
-    if (redBrick) {
-        return Color(red);
-    } else if (blueBrick) {
-        return Color(blue);
-    } else if (greenBrick) {
-        return Color(green);
-    }
-
-    return Color(yellow);
 }
 
 ColorDetection::ColorDetection(char* filename) {
@@ -161,45 +142,55 @@ ColorDetection::ColorDetection(char* filename) {
     bitwise_and(img, img, res_blue, blue_mask);
     bitwise_and(img, img, res_yellow, yellow_mask);
 
-    redCounter = detect_max_color(red_mask, 0,this);
-    greenCounter = detect_max_color(green_mask, 1, this);
-    blueCounter = detect_max_color(blue_mask, 2, this);
-    yellowCounter = detect_max_color(yellow_mask, 3, this);
+    Color red_c = Color::red;
+    Color green_c = Color::green;
+    Color blue_c = Color::blue;
+    Color yellow_c = Color::yellow;
+
+    red_counter = detect_max_color(red_mask, red_c,this);
+    green_counter = detect_max_color(green_mask, green_c, this);
+    blue_counter = detect_max_color(blue_mask, blue_c, this);
+    yellow_counter = detect_max_color(yellow_mask, yellow_c, this);
+
+    if(red_brick != green_brick != blue_brick != yellow_brick){
+        if(red_brick){
+            color_detection_result = Color_detected::red;
+        }else if(green_brick){
+            color_detection_result = Color_detected::green;
+        }else if(blue_brick){
+            color_detection_result = Color_detected::blue;
+        }else if(yellow_brick){
+            color_detection_result = Color_detected::yellow;
+        }
+    }else if(!red_brick && !green_brick && !blue_brick && !yellow_brick){
+        color_detection_result = Color_detected::no_object;
+    }else{
+        color_detection_result = Color_detected::several_colors;
+    }
 }
 
 int main(int argc, char* argv[]){
-    ColorDetection newDetection(argv[1]);
-    if(newDetection.redBrick != newDetection.greenBrick != newDetection.blueBrick != newDetection.yellowBrick){
-        if(newDetection.redBrick){
-            if(newDetection.redBrickOnlyOne){
-                cout << "Red Brick On Line";
-            }else{
-                cout << "More than one red brick on line";
-            }
-        }else if(newDetection.greenBrick){
-            if(newDetection.greenBrickOnlyOne){
-                cout << "Green Brick On Line";
-            }else{
-                cout << "More than one green brick on line";
-            }
-        }else if(newDetection.blueBrick){
-            if(newDetection.blueBrickOnlyOne){
-                cout << "Blue Brick On Line";
-            }else{
-                cout << "More than one blue brick on line ";
-            }
-        }else if(newDetection.yellowBrick){
-            if(newDetection.yellowBrickOnlyOne){
-                cout << "Yellow Brick On Line";
-            }else{
-                cout << "More than one yellow brick on line";
-            }
-        }
-    }else if(!newDetection.redBrick && !newDetection.greenBrick && !newDetection.blueBrick && !newDetection.yellowBrick){
-        cout << "Mistake no object on the line";
-    }else{
-        cout << "Mistake more than one colour of bricks on the line";
+    ColorDetection new_detection(argv[1]);
+    switch(new_detection.color_detection_result){
+        case Color_detected::red:
+            cout << "Red Brick on Line\n";
+            break;
+        case Color_detected::green:
+            cout << "Green Brick on Line\n";
+            break;
+        case Color_detected::blue:
+            cout << "Blue Brick on Line\n";
+            break;
+        case Color_detected::yellow:
+            cout << "Yellow Brick on Line\n";
+            break;
+        case Color_detected::no_object:
+            cout << "No Brick on Line\n";
+            break;
+        case Color_detected::several_colors:
+            cout << "Several Colors on Line\n";
+            break;
     }
-    cout << "\n";
-    show(newDetection.img, newDetection.redCounter, newDetection.greenCounter, newDetection.blueCounter, newDetection.yellowCounter, newDetection);
+
+    show(new_detection.img, new_detection.red_counter, new_detection.green_counter, new_detection.blue_counter, new_detection.yellow_counter, new_detection);
 }

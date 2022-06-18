@@ -6,7 +6,7 @@
 #define EES_CONTROLLER_H
 
 using namespace std;
-enum Color {red, blue, yellow, green};
+//enum Color {red, blue, yellow, green};
 
 class Controller {
 public:
