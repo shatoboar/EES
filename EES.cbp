@@ -72,10 +72,10 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/Users/timooeltze/CLionProjects/EES/colorDetection/colordetection.cpp">
+		<Unit filename="/Users/timooeltze/CLionProjects/EES/colorDetection/test_colordetection.cpp">
 			<Option target="EES"/>
 		</Unit>
-		<Unit filename="/Users/timooeltze/CLionProjects/EES/colorDetection/colordetection.h">
+		<Unit filename="/Users/timooeltze/CLionProjects/EES/colorDetection/test_colordetection.h">
 			<Option target="EES"/>
 		</Unit>
 		<Unit filename="/Users/timooeltze/CLionProjects/EES/CMakeLists.txt">

@@ -32,7 +32,7 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 22,
+				"line" : 24,
 				"parent" : 0
 			},
 			{
@@ -417,12 +417,12 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "colorDetection/colordetection.cpp",
+			"path" : "colorDetection/test_colordetection.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
-			"path" : "colorDetection/colordetection.h",
+			"path" : "colorDetection/test_colordetection.h",
 			"sourceGroupIndex" : 1
 		}
 	],

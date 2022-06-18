@@ -129,29 +129,29 @@ EES/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/build
 .PHONY : EES/fast
 
-colorDetection/colordetection.o: colorDetection/colordetection.cpp.o
-.PHONY : colorDetection/colordetection.o
+colorDetection/test_colordetection.o: colorDetection/test_colordetection.cpp.o
+.PHONY : colorDetection/test_colordetection.o
 
 # target to build an object file
-colorDetection/colordetection.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o
-.PHONY : colorDetection/colordetection.cpp.o
+colorDetection/test_colordetection.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o
+.PHONY : colorDetection/test_colordetection.cpp.o
 
-colorDetection/colordetection.i: colorDetection/colordetection.cpp.i
-.PHONY : colorDetection/colordetection.i
+colorDetection/test_colordetection.i: colorDetection/test_colordetection.cpp.i
+.PHONY : colorDetection/test_colordetection.i
 
 # target to preprocess a source file
-colorDetection/colordetection.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/colordetection.cpp.i
-.PHONY : colorDetection/colordetection.cpp.i
+colorDetection/test_colordetection.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.i
+.PHONY : colorDetection/test_colordetection.cpp.i
 
-colorDetection/colordetection.s: colorDetection/colordetection.cpp.s
-.PHONY : colorDetection/colordetection.s
+colorDetection/test_colordetection.s: colorDetection/test_colordetection.cpp.s
+.PHONY : colorDetection/test_colordetection.s
 
 # target to generate assembly for a file
-colorDetection/colordetection.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/colordetection.cpp.s
-.PHONY : colorDetection/colordetection.cpp.s
+colorDetection/test_colordetection.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.s
+.PHONY : colorDetection/test_colordetection.cpp.s
 
 # Help Target
 help:
@@ -162,9 +162,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... EES"
-	@echo "... colorDetection/colordetection.o"
-	@echo "... colorDetection/colordetection.i"
-	@echo "... colorDetection/colordetection.s"
+	@echo "... colorDetection/test_colordetection.o"
+	@echo "... colorDetection/test_colordetection.i"
+	@echo "... colorDetection/test_colordetection.s"
 .PHONY : help
 
 

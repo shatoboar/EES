@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/timooeltze/CLionProjects/EES/colorDetection/colordetection.cpp" "CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o" "gcc" "CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o.d"
+  "/Users/timooeltze/CLionProjects/EES/colorDetection/test_colordetection.cpp" "CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o" "gcc" "CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o.d"
   )
 
 # Targets to which this target links.

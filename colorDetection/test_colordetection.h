@@ -5,6 +5,12 @@
 #ifndef EES_TEST_COLORDETECTION_H
 #define EES_TEST_COLORDETECTION_H
 
+#include <cstdio>
+#include <string>
+#include <iostream>
+#include <sstream>
+
+using namespace std;
 
 class test_colordetection {
 

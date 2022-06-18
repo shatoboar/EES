@@ -5,10 +5,12 @@
 #include "test_colordetection.h"
 #include "colordetection.h"
 
-int main() {
-    auto integers = {1, 2, 3, 4, 5};
+int main(int argc, char* argv[]) {
+    char filePath[] = "./picturesFinalPosition/redBrickOnLineMiddle.jpg";
+    ColorDetection newColorDetection(filePath);
+    Color_detected result = newColorDetection.color_detection_result;
 
-    if (sum_integers(integers) == 15) {
+    if (Color_detected::blue == result) {
         return 0;
     } else {
         return 1;

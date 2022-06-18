@@ -14,8 +14,10 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(colorDetection)
 
 add_executable(EES
-        ./colorDetection/colordetection.cpp
-        ./colorDetection/colordetection.h ./colorDetection/colordetection.cpp)
+        ./colorDetection/test_colordetection.cpp
+        ./colorDetection/test_colordetection.h ./colorDetection/test_colordetection.cpp)
+        #./colorDetection/colordetection.cpp
+        #./colorDetection/colordetection.h ./colorDetection/colordetection.cpp)
         #./Controller/controller.cpp
         #./Controller/controller.h ./Controller/controller.cpp)
 

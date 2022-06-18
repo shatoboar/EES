@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o"
-  "CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o.d"
+  "CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o"
+  "CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o.d"
   "EES"
   "EES.pdb"
 )

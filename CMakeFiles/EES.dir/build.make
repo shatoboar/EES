@@ -69,28 +69,28 @@ include CMakeFiles/EES.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/EES.dir/flags.make
 
-CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o: CMakeFiles/EES.dir/flags.make
-CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o: colorDetection/colordetection.cpp
-CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o: CMakeFiles/EES.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/timooeltze/CLionProjects/EES/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o -MF CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o.d -o CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o -c /Users/timooeltze/CLionProjects/EES/colorDetection/colordetection.cpp
+CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o: CMakeFiles/EES.dir/flags.make
+CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o: colorDetection/test_colordetection.cpp
+CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o: CMakeFiles/EES.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/timooeltze/CLionProjects/EES/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o -MF CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o.d -o CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o -c /Users/timooeltze/CLionProjects/EES/colorDetection/test_colordetection.cpp
 
-CMakeFiles/EES.dir/colorDetection/colordetection.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/EES.dir/colorDetection/colordetection.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/timooeltze/CLionProjects/EES/colorDetection/colordetection.cpp > CMakeFiles/EES.dir/colorDetection/colordetection.cpp.i
+CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.i"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/timooeltze/CLionProjects/EES/colorDetection/test_colordetection.cpp > CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.i
 
-CMakeFiles/EES.dir/colorDetection/colordetection.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/EES.dir/colorDetection/colordetection.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/timooeltze/CLionProjects/EES/colorDetection/colordetection.cpp -o CMakeFiles/EES.dir/colorDetection/colordetection.cpp.s
+CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.s"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/timooeltze/CLionProjects/EES/colorDetection/test_colordetection.cpp -o CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.s
 
 # Object files for target EES
 EES_OBJECTS = \
-"CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o"
+"CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o"
 
 # External object files for target EES
 EES_EXTERNAL_OBJECTS =
 
-EES: CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o
+EES: CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o
 EES: CMakeFiles/EES.dir/build.make
 EES: /opt/homebrew/lib/libopencv_gapi.4.5.5.dylib
 EES: /opt/homebrew/lib/libopencv_stitching.4.5.5.dylib
