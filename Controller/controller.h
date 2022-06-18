@@ -5,12 +5,15 @@
 #ifndef EES_CONTROLLER_H
 #define EES_CONTROLLER_H
 
+using namespace std;
+enum Color {red, blue, yellow, green};
 
-
-class controller {
-
+class Controller {
+public:
+    int buckets;
+    bool hasConnection;
+    Controller();
 };
-
 
 
 #endif //EES_CONTROLLER_H

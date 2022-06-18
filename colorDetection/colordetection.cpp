@@ -2,8 +2,8 @@
 // Created by tristan on 05.06.22.
 //
 #include <colordetection.h>
+#include <../Controller/controller.h>
 #include <iostream>
-#include <string.h>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -106,6 +106,26 @@ void show(Mat img, vector<Point> red, vector<Point> green, vector<Point> blue, v
     imshow("teST", newDetection.img);
     waitKey(12000);
     destroyAllWindows();
+}
+
+bool ColorDetection::onlyOneColor() {
+    if(redBrick != greenBrick != blueBrick != yellowBrick){
+        return true;
+    }
+
+    return false;
+}
+
+Color ColorDetection::returnColor() {
+    if (redBrick) {
+        return Color(red);
+    } else if (blueBrick) {
+        return Color(blue);
+    } else if (greenBrick) {
+        return Color(green);
+    }
+
+    return Color(yellow);
 }
 
 ColorDetection::ColorDetection(char* filename) {
