@@ -85,6 +85,16 @@ edit_cache:
 edit_cache/fast: edit_cache
 .PHONY : edit_cache/fast
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/Applications/CLion.app/Contents/bin/cmake/mac/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+.PHONY : test/fast
+
 # The main all target
 all: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/timooeltze/CLionProjects/EES/CMakeFiles /Users/timooeltze/CLionProjects/EES//CMakeFiles/progress.marks
@@ -117,6 +127,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named colorDetection-Test
+
+# Build rule for target.
+colorDetection-Test: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 colorDetection-Test
+.PHONY : colorDetection-Test
+
+# fast build rule for target.
+colorDetection-Test/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/colorDetection-Test.dir/build.make CMakeFiles/colorDetection-Test.dir/build
+.PHONY : colorDetection-Test/fast
+
+#=============================================================================
 # Target rules for targets named EES
 
 # Build rule for target.
@@ -129,11 +152,36 @@ EES/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/build
 .PHONY : EES/fast
 
+colorDetection/colordetection.o: colorDetection/colordetection.cpp.o
+.PHONY : colorDetection/colordetection.o
+
+# target to build an object file
+colorDetection/colordetection.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/colordetection.cpp.o
+.PHONY : colorDetection/colordetection.cpp.o
+
+colorDetection/colordetection.i: colorDetection/colordetection.cpp.i
+.PHONY : colorDetection/colordetection.i
+
+# target to preprocess a source file
+colorDetection/colordetection.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/colordetection.cpp.i
+.PHONY : colorDetection/colordetection.cpp.i
+
+colorDetection/colordetection.s: colorDetection/colordetection.cpp.s
+.PHONY : colorDetection/colordetection.s
+
+# target to generate assembly for a file
+colorDetection/colordetection.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/colordetection.cpp.s
+.PHONY : colorDetection/colordetection.cpp.s
+
 colorDetection/test_colordetection.o: colorDetection/test_colordetection.cpp.o
 .PHONY : colorDetection/test_colordetection.o
 
 # target to build an object file
 colorDetection/test_colordetection.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/colorDetection-Test.dir/build.make CMakeFiles/colorDetection-Test.dir/colorDetection/test_colordetection.cpp.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.o
 .PHONY : colorDetection/test_colordetection.cpp.o
 
@@ -142,6 +190,7 @@ colorDetection/test_colordetection.i: colorDetection/test_colordetection.cpp.i
 
 # target to preprocess a source file
 colorDetection/test_colordetection.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/colorDetection-Test.dir/build.make CMakeFiles/colorDetection-Test.dir/colorDetection/test_colordetection.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.i
 .PHONY : colorDetection/test_colordetection.cpp.i
 
@@ -150,6 +199,7 @@ colorDetection/test_colordetection.s: colorDetection/test_colordetection.cpp.s
 
 # target to generate assembly for a file
 colorDetection/test_colordetection.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/colorDetection-Test.dir/build.make CMakeFiles/colorDetection-Test.dir/colorDetection/test_colordetection.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/colorDetection/test_colordetection.cpp.s
 .PHONY : colorDetection/test_colordetection.cpp.s
 
@@ -161,7 +211,12 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... test"
 	@echo "... EES"
+	@echo "... colorDetection-Test"
+	@echo "... colorDetection/colordetection.o"
+	@echo "... colorDetection/colordetection.i"
+	@echo "... colorDetection/colordetection.s"
 	@echo "... colorDetection/test_colordetection.o"
 	@echo "... colorDetection/test_colordetection.i"
 	@echo "... colorDetection/test_colordetection.s"

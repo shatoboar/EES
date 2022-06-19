@@ -63,6 +63,7 @@ CMAKE_BINARY_DIR = /Users/timooeltze/CLionProjects/EES
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/colorDetection-Test.dir/all
 all: CMakeFiles/EES.dir/all
 .PHONY : all
 
@@ -71,8 +72,35 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/colorDetection-Test.dir/clean
 clean: CMakeFiles/EES.dir/clean
 .PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/colorDetection-Test.dir
+
+# All Build rule for target.
+CMakeFiles/colorDetection-Test.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/colorDetection-Test.dir/build.make CMakeFiles/colorDetection-Test.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/colorDetection-Test.dir/build.make CMakeFiles/colorDetection-Test.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/timooeltze/CLionProjects/EES/CMakeFiles --progress-num=4,5 "Built target colorDetection-Test"
+.PHONY : CMakeFiles/colorDetection-Test.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/colorDetection-Test.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/timooeltze/CLionProjects/EES/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/colorDetection-Test.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/timooeltze/CLionProjects/EES/CMakeFiles 0
+.PHONY : CMakeFiles/colorDetection-Test.dir/rule
+
+# Convenience name for target.
+colorDetection-Test: CMakeFiles/colorDetection-Test.dir/rule
+.PHONY : colorDetection-Test
+
+# clean rule for target.
+CMakeFiles/colorDetection-Test.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/colorDetection-Test.dir/build.make CMakeFiles/colorDetection-Test.dir/clean
+.PHONY : CMakeFiles/colorDetection-Test.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/EES.dir
@@ -81,12 +109,12 @@ clean: CMakeFiles/EES.dir/clean
 CMakeFiles/EES.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EES.dir/build.make CMakeFiles/EES.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/timooeltze/CLionProjects/EES/CMakeFiles --progress-num=1,2 "Built target EES"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/timooeltze/CLionProjects/EES/CMakeFiles --progress-num=1,2,3 "Built target EES"
 .PHONY : CMakeFiles/EES.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/EES.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/timooeltze/CLionProjects/EES/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/timooeltze/CLionProjects/EES/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/EES.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/timooeltze/CLionProjects/EES/CMakeFiles 0
 .PHONY : CMakeFiles/EES.dir/rule

@@ -3,6 +3,12 @@
 *.bin
 *.rxe
 *.map
+*.json
+*.cmake
+*.DS_STORE
 build
+colorDetection/google_test
+colorDetection/gtest
+CMakeFiles
 kernel_id.h
 kernel_cfg.c

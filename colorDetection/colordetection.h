@@ -47,7 +47,7 @@ public:
     Scalar blue_upper = Scalar(114, 255, 255);
     Scalar yellow_lower = Scalar(15, 100, 100);
     Scalar yellow_upper = Scalar(30, 255, 255);
-    ColorDetection(char* filename);
+    explicit ColorDetection(char* filename);
     vector<Point> get_red_counter();
     vector<Point> get_green_counter();
     vector<Point> get_blue_counter();

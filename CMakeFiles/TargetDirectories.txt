@@ -1,3 +1,5 @@
 /Users/timooeltze/CLionProjects/EES/CMakeFiles/rebuild_cache.dir
 /Users/timooeltze/CLionProjects/EES/CMakeFiles/edit_cache.dir
+/Users/timooeltze/CLionProjects/EES/CMakeFiles/test.dir
+/Users/timooeltze/CLionProjects/EES/CMakeFiles/colorDetection-Test.dir
 /Users/timooeltze/CLionProjects/EES/CMakeFiles/EES.dir

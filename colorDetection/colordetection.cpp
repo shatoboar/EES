@@ -169,7 +169,7 @@ ColorDetection::ColorDetection(char* filename) {
     }
 }
 
-int main(int argc, char* argv[]){
+/*int main(int argc, char* argv[]){
     ColorDetection new_detection(argv[1]);
     switch(new_detection.color_detection_result){
         case Color_detected::red:
@@ -193,4 +193,4 @@ int main(int argc, char* argv[]){
     }
 
     show(new_detection.img, new_detection.red_counter, new_detection.green_counter, new_detection.blue_counter, new_detection.yellow_counter, new_detection);
-}
+}*/

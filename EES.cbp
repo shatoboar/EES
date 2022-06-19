@@ -37,6 +37,50 @@
 					<DistClean command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="test">
+				<Option working_dir="/Users/timooeltze/CLionProjects/EES"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 test"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="colorDetection-Test">
+				<Option output="/Users/timooeltze/CLionProjects/EES/colorDetection-Test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/timooeltze/CLionProjects/EES"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/opt/homebrew/Cellar/opencv/4.5.5_2/include/opencv4"/>
+					<Add directory="/Users/timooeltze/CLionProjects/EES/colorDetection"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 colorDetection-Test"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="colorDetection-Test/fast">
+				<Option output="/Users/timooeltze/CLionProjects/EES/colorDetection-Test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/timooeltze/CLionProjects/EES"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/opt/homebrew/Cellar/opencv/4.5.5_2/include/opencv4"/>
+					<Add directory="/Users/timooeltze/CLionProjects/EES/colorDetection"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 colorDetection-Test/fast"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/timooeltze/CLionProjects/EES/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="EES">
 				<Option output="/Users/timooeltze/CLionProjects/EES/EES" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/Users/timooeltze/CLionProjects/EES"/>
@@ -72,7 +116,14 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/timooeltze/CLionProjects/EES/colorDetection/colordetection.cpp">
+			<Option target="EES"/>
+		</Unit>
+		<Unit filename="/Users/timooeltze/CLionProjects/EES/colorDetection/colordetection.h">
+			<Option target="EES"/>
+		</Unit>
 		<Unit filename="/Users/timooeltze/CLionProjects/EES/colorDetection/test_colordetection.cpp">
+			<Option target="colorDetection-Test"/>
 			<Option target="EES"/>
 		</Unit>
 		<Unit filename="/Users/timooeltze/CLionProjects/EES/colorDetection/test_colordetection.h">
