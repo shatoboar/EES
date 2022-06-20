@@ -1,0 +1,111 @@
+
+
+    #include "implementation.oil"
+
+    CPU ATMEL_AT91SAM7S256
+    {
+      OS LEJOS_OSEK
+      {
+        STATUS = EXTENDED;
+        STARTUPHOOK = FALSE;
+        ERRORHOOK = FALSE;
+        SHUTDOWNHOOK = FALSE;
+        PRETASKHOOK = FALSE;
+        POSTTASKHOOK = FALSE;
+        USEGETSERVICEID = FALSE;
+        USEPARAMETERACCESS = FALSE;
+        USERESSCHEDULER = FALSE;
+      };
+
+      /* Definition of application mode */
+      APPMODE appmode1{};
+
+      RESOURCE ResourceMainRobot
+      {
+        RESOURCEPROPERTY = STANDARD;
+      };
+      RESOURCE ResourceExecuteCommand
+      {
+        RESOURCEPROPERTY = STANDARD;
+      };
+
+
+      /* Definition of EventDispatcher */
+      TASK EventDispatcherTask
+      {
+        AUTOSTART = FALSE;
+        PRIORITY = 3;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+        RESOURCE = ResourceMainRobot;
+      };
+
+      TASK MainTask
+      {
+        AUTOSTART = TRUE
+        {
+          APPMODE = appmode1;
+        };
+        PRIORITY = 5;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+
+        RESOURCE = ResourceMainRobot;
+        RESOURCE = ResourceExecuteCommand;
+
+      };
+
+      /* Definition of TaskLCD */
+      TASK LCDTask
+      {
+        AUTOSTART = FALSE;
+        PRIORITY = 10;
+        ACTIVATION = 1;
+        SCHEDULE = FULL;
+        STACKSIZE = 512; /* Stack size */
+        RESOURCE = ResourceMainRobot;
+        RESOURCE = ResourceExecuteCommand;
+      };
+
+      /* Definition of OSEK Alarm Counter */
+      COUNTER SysTimerCnt
+      {
+        MINCYCLE = 1;
+        MAXALLOWEDVALUE = 10000;
+        TICKSPERBASE = 1; /* One tick is equal to 1msec */
+      };
+
+      /* Definition of EventDispatcher execution timing */
+      ALARM cyclic_alarm1
+      {
+        COUNTER = SysTimerCnt;
+        ACTION = ACTIVATETASK
+        {
+          TASK = EventDispatcherTask;
+        };
+        AUTOSTART = TRUE
+        {
+          ALARMTIME = 1;
+          CYCLETIME = 1; /* EventDispatcher is executed every 1msec */
+          APPMODE = appmode1;
+        };
+      };
+
+      /* Definition of TaskLCD execution timing */
+      ALARM cyclic_alarmLCD
+      {
+        COUNTER = SysTimerCnt;
+        ACTION = ACTIVATETASK
+        {
+          TASK = LCDTask  ;
+        };
+        AUTOSTART = TRUE
+        {
+          ALARMTIME = 1;
+          CYCLETIME = 10; /* TaskLCD is executed every 100msec */
+          APPMODE = appmode1;
+        };
+      };
+    };
