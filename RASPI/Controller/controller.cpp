@@ -18,7 +18,7 @@ bool readyForNewObject() {
     return true;
 }
 
-void mainRoutine(Controller newController) {
+/*void mainRoutine(Controller newController) {
     bool ready = readyForNewObject();
 
     while (ready) {
@@ -35,7 +35,7 @@ void mainRoutine(Controller newController) {
         ready = readyForNewObject();
     }
 
-}
+}*/
 
 int main(int argc, char* argv[]){
     Controller newController;
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]){
     newController.hasConnection = hasConnection(newController.buckets);
 
     if (newController.hasConnection) {
-        mainRoutine(newController);
+        //mainRoutine(newController);
     }
 }
 
