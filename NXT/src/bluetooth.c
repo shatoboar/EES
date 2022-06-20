@@ -1,4 +1,3 @@
-/* /1* btslave.c *1/ */ 
 #include <string.h> 
 #include <stdbool.h> 
 #include "kernel.h"
@@ -178,4 +177,3 @@ TASK(IdleTask) {
     }
 
 }
-

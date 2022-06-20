@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "motor_helper.h": "c",
+        "*.oil": "c",
+        "mainroutine3.h": "c"
+    }
+}

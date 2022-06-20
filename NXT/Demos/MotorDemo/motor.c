@@ -91,7 +91,7 @@ TASK(EventCallback)
     {
         WaitEvent(TouchSensorOnEvent); /* Task is in waiting status until the Event comes */
         ClearEvent(TouchSensorOnEvent);
-        nxt_motor_set_speed(NXT_PORT_A, 100, 1);
+        nxt_motor_set_speed(NXT_PORT_C, 50, 1);
 
         GetResource(ResourceNumber);
         val = 100;
@@ -99,7 +99,7 @@ TASK(EventCallback)
 
         WaitEvent(TouchSensorOffEvent);
         ClearEvent(TouchSensorOffEvent);
-        nxt_motor_set_speed(NXT_PORT_A, 0, 1);
+        nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 
         GetResource(ResourceNumber);
         val = 0;
@@ -151,10 +151,19 @@ TASK(EventRightCallback)
         count = nxt_motor_get_count(NXT_PORT_A);
         nxt_motor_set_count(NXT_PORT_A, 0);
 
+    TASK(EventRightCallback) 
+    {
+      while (1) 
+      {
+        WaitEvent(RightSensorOnEvent);
+        ClearEvent(RightSensorOnEvent);
+        
+        nxt_motor_set_speed(NXT_PORT_C, -50, 1);
+
         WaitEvent(RightSensorOffEvent);
         ClearEvent(RightSensorOffEvent);
 
-        nxt_motor_set_speed(NXT_PORT_A, 0, 1);
+        nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 
     }
 
