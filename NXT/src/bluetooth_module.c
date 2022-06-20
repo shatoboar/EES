@@ -9,6 +9,8 @@ bool verify(U8 msg, U8 checksum);
 void marshal(U8* buf, U8 msg_type, U8 msg_payload);
 bool unmarshal(U8 *buf, int buf_len);
 bool bluetooth_send(int cmd) ;
+U8 recv(int expectedCmd);
+U8 send(int cmd);
 
 bool verify(U8 msg, U8 checksum) 
 {
@@ -49,90 +51,80 @@ bool bluetooth_poll() {
     return ecrobot_get_bt_status() == BT_STREAM; 
 }
 
-/*bool send(int cmd) { */
-/*    static SINT bt_status = BT_NO_INIT; */
-/*    U8 bt_recv_buf[4]; */
-/*    U8 bt_send_buf[4]; */
 
-/*    while(1) */ 
-/*    { */
-/*#ifdef RUNTIME_CONNECTION */
-/*        ecrobot_init_bt_slave("1234"); */
-/*#endif */
-/*        if (ecrobot_get_bt_status() == BT_STREAM && bt_status != BT_STREAM) { */
-/*            marshal(bt_send_buf, cmd, 0); */
-/*            ecrobot_send_bt(bt_send_buf, 0, 4); */
+/*
+ * @brief This is a *blocking* wrapper function for sending a command to the PI
+ *
+ *
+ * @param cmd is the command type defined in the bluetooth_module.h
+ * @returns the message_payload from the expected command
+ *
+ * */
+U8 send(int cmd) {
+    static SINT bt_status = BT_NO_INIT;
+    U8 bt_recv_buf[4];
+    U8 bt_send_buf[4];
+    bool first = true; // says whether we have sent our message or not
 
-/*            int read = 0; */
-/*            while(read == 0){ */
-/*                read = ecrobot_read_bt(bt_recv_buf, 0, 4); */
-/*                systick_wait_ms(500); */
-/*            } */
+    while(1) 
+    {
+#ifdef RUNTIME_CONNECTION
+        ecrobot_init_bt_slave("1234");
+#endif
+        if (ecrobot_get_bt_status() == BT_STREAM && bt_status != BT_STREAM) {
 
-/*            bool ok = unmarshal(bt_recv_buf, read); */
-/*            if (!ok) { */
-/*                marshal(bt_send_buf, ERROR, 0); */
-/*                ecrobot_send_bt(bt_send_buf, 0, 4); */
-/*                continue; */
-/*            } */ 
+            // We have already send the cmd message once, we had an error in the response, which the PI should send again.
+            if (first) {
+                marshal(bt_send_buf, cmd, 0);
+                ecrobot_send_bt(bt_send_buf, 0, 4);
+            }
 
-/*            return true; */
-/*        } */
-/*    } */
-/*} */
+            int read = 0;
+            while (read == 0) {
+                read = ecrobot_read_bt(bt_recv_buf, 0, 4);
+                systick_wait_ms(500);
+            }
 
-/*/1* */
-/* * @brief This is a wrapper function for reading that sends back an ack under the hood. */
-/* * */
-/* * @param this is the expected command at thsi current stage */
-/* * @returns 0 if all right, else returns whatever is expected at the current stage */
-/* * */
-/* * *1/ */
-/*U8 recv(int expectedCmd) { */
-/*    static SINT bt_status = BT_NO_INIT; */
-/*    U8 bt_recv_buf[4]; */
-/*    U8 bt_send_buf[4]; */
+            bool ok = unmarshal(bt_recv_buf, read);
+            if (!ok) {
+                marshal(bt_send_buf, ERROR, 0);
+                ecrobot_send_bt(bt_send_buf, 0, 4);
+                first = false;
+                continue;
+            } 
 
-/*    while(1) */ 
-/*    { */
-/*#ifdef RUNTIME_CONNECTION */
-/*        ecrobot_init_bt_slave("1234"); */
-/*#endif */
-/*        if (ecrobot_get_bt_status() == BT_STREAM && bt_status != BT_STREAM) { */
-/*            int read = 0; */
-/*            while(read == 0){ */
-/*                read = ecrobot_read_bt(bt_recv_buf, 0, 4); */
-/*                systick_wait_ms(500); */
-/*            } */
+            U8 message_type = bt_recv_buf[0];
+            U8 message_payload  = bt_recv_buf[1];
 
-/*            // if we don't receive a correct message then we restart the loop */
-/*            bool ok = unmarshal(bt_recv_buf, read); */
-/*            if (!ok) { */
-/*                marshal(bt_send_buf, ERROR, 0); */
-/*                ecrobot_send_bt(bt_send_buf, 0, 4); */
-/*                continue; */
-/*            } */ 
+            switch (message_type)
+            {
+                case ACK: 
+                    // we need to listen for the payload and send back an acknowledgement
+                    first = false;
+                    continue;
+                case ERROR:
+                    // resend old message, since they have sent back an error
+                    marshal(bt_send_buf, cmd, 0);
+                    ecrobot_send_bt(bt_send_buf, 0, 4);
+                    break;
+                default:
+                    return message_payload;
+            }
+           
+            return message_payload;
+        }
+    }
+}
 
-/*            U8 message_type = bt_recv_buf[0]; */
-/*            U8 message_payload  = bt_recv_buf[1]; */
-
-/*            // received message type wasn't what we expected send back error */
-/*            if (message_type != cmd) { */ 
-/*                marshal(bt_send_buf, ERROR, 0); */
-/*                ecrobot_send_bt(bt_send_buf, 0, 4); */
-/*                continue; */
-/*            } */
-
-/*            marshal(bt_send_buf, ACK, 0); */
-/*            ecrobot_send_bt(bt_send_buf, 0, 4); */
-/*            return message_payload; */
-/*        } */
-/*    } */
-/*} */
-
-// ATTENTION: this needs to be implemented in a loop 
-// call this function inside ecrobot_device_initialize
-bool bluetooth_init(int numOfBuckets) {
+/*
+ * @brief This is a *blocking* wrapper function for reading that sends back an ack under the hood.
+ *
+ *
+ * @param this is the expected command at thsi current stage
+ * @returns the message_payload from the expected command
+ *
+ * */
+U8 recv(int expectedCmd) {
     static SINT bt_status = BT_NO_INIT;
     U8 bt_recv_buf[4];
     U8 bt_send_buf[4];
@@ -157,38 +149,34 @@ bool bluetooth_init(int numOfBuckets) {
                 continue;
             } 
 
+            U8 message_type = bt_recv_buf[0];
+            U8 message_payload  = bt_recv_buf[1];
+
+            // received message type wasn't what we expected send back error
+            if (message_type != expectedCmd) { 
+                marshal(bt_send_buf, ERROR, 0);
+                ecrobot_send_bt(bt_send_buf, 0, 4);
+                continue;
+            }
+
             marshal(bt_send_buf, ACK, 0);
             ecrobot_send_bt(bt_send_buf, 0, 4);
 
-            systick_wait_ms(500);
-
-            marshal(bt_send_buf, INIT, numOfBuckets);
-            ecrobot_send_bt(bt_send_buf, 0, 4);
-            break;
+            return message_payload;
         }
     }
 }
 
+// ATTENTION: this needs to be implemented in a loop 
+// call this function inside ecrobot_device_initialize
+bool bluetooth_init(int numOfBuckets) {
+    recv(INIT); // we can ignore the payload, since the init command from the pi should have any payload
+    systick_wait_ms(500); 
+    send(INIT);
+    return true;
+}
+
 bool bluetooth_rcv_next_stone_signal() {
-    int read = 0;
-    U8 bt_recv_buf[4];
-    U8 bt_send_buf[4];
-
-    while (1)
-    {
-        while(read == 0){
-            read = ecrobot_read_bt(bt_recv_buf, 0, 4);
-            systick_wait_ms(500);
-        }
-
-        bool ok = unmarshal(bt_recv_buf, read);
-        if (!ok) {
-            marshal(bt_send_buf, ERROR, 0);
-            ecrobot_send_bt(bt_send_buf, 0, 4);
-            return false;
-        } 
-    }
-
     return true;
 }
 
