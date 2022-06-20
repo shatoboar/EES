@@ -4,6 +4,7 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
 #include "client.h"
+#include <inttypes.h>
 
 #define MSG_RESEND 255
 #define ACK 1
@@ -21,7 +22,6 @@ int main(int argc, char **argv)
 	char dest[18] = "00:16:53:0F:77:72";
 	uint8_t recv_buf[4];
 	uint8_t send_buf[4];
-
 	// allocate a socket
 	s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	// send a message
 	if(status == 0) {
 		printf("Connection successful\n");
-	}
+	} 
 
 
 	if(status==0){
@@ -50,6 +50,7 @@ int main(int argc, char **argv)
 	if (status < 0) perror("uh oh");
 
 	close(s);
+	
 	return 0;
 }
 
@@ -64,6 +65,7 @@ void printBits(uint8_t num)
 }
 
 int unmarshal(uint8_t* recv_buf, int bytes_read){
+	
 	if (bytes_read != 4){
 		printf("Wrong amount of bytes received!\n");
 		return -1;	
@@ -71,15 +73,16 @@ int unmarshal(uint8_t* recv_buf, int bytes_read){
 	if (bytes_read > 0) {
 		for (int i = 0; i < bytes_read; i++) {
 			printf("[");
-			printf("%d", recv_buf[i]);
+			printf("%d",recv_buf[i]);
 			printf("]\n");
 		}
-		printf("%d\n", bytes_read);    
+
 	}
 
-       	if (recv_buf[0] != ~recv_buf[2]  || recv_buf[1] != ~recv_buf[3]){
-		printf("%u \n", ~recv_buf[2]);
-		printf("%u \n", ~recv_buf[3]); //TODO figure out why negations don't work
+
+       	if ((uint8_t)recv_buf[0] != (uint8_t)~recv_buf[2]  || (uint8_t)recv_buf[1] != (uint8_t) ~recv_buf[3]){
+		printf("%d \n", ~recv_buf[0]);
+		printf("%d \n", ~recv_buf[2]); //TODO figure out why negations don't work
 	       	printf("Checksum Error! \n");
 	       	return -1;
        	}
