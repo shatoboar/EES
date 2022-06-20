@@ -15,32 +15,18 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 include_directories(colorDetection)
 
-include(FetchContent)
-FetchContent_Declare(
-        googletest
-        # Specify the commit you depend on and update it regularly.
-        URL https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip
-)
-
 add_executable(EES
-        ./colorDetection/test_colordetection.cpp
+        ./colorDetection/colordetection.cpp
         ./colorDetection/colordetection.h ./colorDetection/colordetection.cpp
-        ./colorDetection/test_colordetection.h ./colorDetection/test_colordetection.cpp)
+        ./colorDetection/tests/test_colordetection.h ./colorDetection/tests/test_colordetection.cpp)
         #./Controller/controller.cpp
         #./Controller/controller.h ./Controller/controller.cpp)
 
 target_link_libraries(EES ${OpenCV_LIBS})
+add_library(colorDetection ./colorDetection/colordetection.cpp)
+target_include_directories(colorDetection PUBLIC include)
 
-enable_testing()
-add_executable(
-        colorDetection-Test
-        ./colorDetection/test_colordetection.cpp
-)
+add_subdirectory(colorDetection/tests)
 
-target_link_libraries(
-        colorDetection-Test
-        gtest_main
-)
 
-include(GoogleTest)
-gtest_discover_tests(colorDetection-Test)
+

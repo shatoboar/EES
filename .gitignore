@@ -4,11 +4,13 @@
 *.rxe
 *.map
 *.json
+*.DS_Store
+CMakeCache.txt
 *.cmake
-*.DS_STORE
-build
-colorDetection/google_test
-colorDetection/gtest
+.idea
+CMakeFiles
+cmake-build-debug
+colorDetection/cmake-build-debug
 CMakeFiles
 kernel_id.h
 kernel_cfg.c
