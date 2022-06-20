@@ -23,6 +23,11 @@ typedef enum class Color_detected
     red, green, blue, yellow, no_object, several_colors
 }Color_detected;
 
+typedef enum class Size_detected
+{
+    two_times_two, two_times_three, two_times_four, serveral_sizes, unknown_sizes)
+}Size_detected;
+
 class ColorDetection {
 public:
     Mat img;
@@ -39,6 +44,7 @@ public:
     bool blue_brick_only_one;
     bool yellow_brick_only_one;
     Color_detected color_detection_result;
+    Size_detected size_detection_resul;
     Scalar red_lower = Scalar(136, 87, 111);
     Scalar red_upper = Scalar(180, 255, 255);
     Scalar green_lower = Scalar(36, 25, 25);
