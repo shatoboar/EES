@@ -25,7 +25,7 @@ typedef enum class Color_detected
 
 typedef enum class Size_detected
 {
-    two_times_two, two_times_three, two_times_four, serveral_sizes, unknown_sizes)
+    two_times_two, two_times_three, two_times_four, serveral_sizes, unknown_sizes
 }Size_detected;
 
 class ColorDetection {
