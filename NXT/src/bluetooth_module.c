@@ -10,7 +10,7 @@ void marshal(U8* buf, U8 msg_type, U8 msg_payload);
 bool unmarshal(U8 *buf, int buf_len);
 bool bluetooth_send(int cmd) ;
 U8 recv(int expectedCmd);
-U8 send(int cmd);
+U8 send(U8 type, U8 payload);
 
 bool verify(U8 msg, U8 checksum) 
 {
@@ -56,11 +56,11 @@ bool bluetooth_poll() {
  * @brief This is a *blocking* wrapper function for sending a command to the PI
  *
  *
- * @param cmd is the command type defined in the bluetooth_module.h
+ * @param type is the command type defined in the bluetooth_module.h
  * @returns the message_payload from the expected command
  *
  * */
-U8 send(int cmd) {
+U8 send(U8 type, U8 payload) {
     static SINT bt_status = BT_NO_INIT;
     U8 bt_recv_buf[4];
     U8 bt_send_buf[4];
@@ -73,9 +73,9 @@ U8 send(int cmd) {
 #endif
         if (ecrobot_get_bt_status() == BT_STREAM && bt_status != BT_STREAM) {
 
-            // We have already send the cmd message once, we had an error in the response, which the PI should send again.
+            // We have already send the message once, we had an error in the response, which the PI should send again.
             if (first) {
-                marshal(bt_send_buf, cmd, 0);
+                marshal(bt_send_buf, type, payload);
                 ecrobot_send_bt(bt_send_buf, 0, 4);
             }
 
@@ -104,7 +104,7 @@ U8 send(int cmd) {
                     continue;
                 case ERROR:
                     // resend old message, since they have sent back an error
-                    marshal(bt_send_buf, cmd, 0);
+                    marshal(bt_send_buf, type, payload);
                     ecrobot_send_bt(bt_send_buf, 0, 4);
                     break;
                 default:
@@ -172,7 +172,7 @@ U8 recv(int expectedCmd) {
 bool bluetooth_init(int numOfBuckets) {
     recv(INIT); // we can ignore the payload, since the init command from the pi should have any payload
     systick_wait_ms(500); 
-    send(INIT);
+    send(INIT, numOfBuckets);
     return true;
 }
 
