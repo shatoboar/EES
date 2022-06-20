@@ -4,7 +4,7 @@
 
 #include "test_colordetection.h"
 #include "colordetection.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 TEST(BlueBrickDetection, Detected) {
     char filepath[] = "./picturesFinalPosition/blueBrickOnLineLeft.jpg";

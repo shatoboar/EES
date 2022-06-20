@@ -1,20 +1,26 @@
-include(FetchContent)
+cmake_minimum_required(VERSION 3.14)
+project(my_project)
 
+# GoogleTest requires at least C++11
+set(CMAKE_CXX_STANDARD 11)
+
+include(FetchContent)
 FetchContent_Declare(
         googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG        release-1.11.0
+        URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
 )
 
-FetchContent_MakeAvailable(googletest)
-add_library(GTest::GTest INTERFACE IMPORTED)
-target_link_libraries(GTest::GTest INTERFACE gtest_main)
-find_package(GTest REQUIRED)
-add_executable(test_colordetection test_colordetection.cpp)
+enable_testing()
 
-target_link_libraries(test_colordetection
-        PRIVATE
-        GTest::GTest
-        colordetection)
+add_executable(
+        test_colordetection
+        test_colordetection.cpp
+        test_colordetection.h
+)
+target_link_libraries(
+        test_colordetection
+        gtest_main
+)
 
-add_test(tests test_colordetection)
+include(GoogleTest)
+gtest_discover_tests(test_colordetection)
