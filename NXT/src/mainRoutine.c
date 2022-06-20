@@ -12,7 +12,7 @@
 
 #include "duties.h"
 #include "motor_helper.h"
-#include "bluetooth.h"
+#include "bluetooth_module.h"
 
 DeclareCounter(SysTimerCnt);
 
@@ -258,6 +258,14 @@ TASK(MainTask) {
         static bool should_finish = false; //TODO remove
 
         static bool ok; //helper flag
+        static U8 box; 
+
+        
+        ok = bluetooth_init();
+        if (ok) { //TODO
+
+        }
+
 
         switch(MODE) {
           case RESET_TASK:
@@ -277,7 +285,11 @@ TASK(MainTask) {
             NEXT_BOX_TARGET = -1;
             ReleaseResource(ResourceExecuteCommand);
 
-            MODE = READY_FOR_STONE_TASK;
+            //send signal to PI that NXT is ready
+            ok = bluetooth_send_stone_sorted_signal();
+            if (ok) {
+              MODE = READY_FOR_STONE_TASK;
+            }
           break;
 
 
@@ -376,6 +388,10 @@ TASK(MainTask) {
           break;
 
           case CALIBRATE_MOVE_LEFT_TASK:
+            ok = bluetooth_init();
+            if (ok) { //TODO
+
+            }
             
             TOUCH_SENSOR_LEFT_ACTIVATED = true;
             
@@ -410,9 +426,9 @@ TASK(MainTask) {
           case TAKE_PICTURE_TASK:
             
             //TODO wait until signal from PI for correct box info
-            
+            box = bluetooth_rcv_next_stone_signal();
 
-            //MOCK SIMULATION
+            //MOCK SIMULATION TODO remove
             current_box_index++; //current_box_index is only for simulating PI data and will be removed later
             if (current_box_index >= max_box) {
               current_box_index = -1;
