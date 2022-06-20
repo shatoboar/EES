@@ -1,0 +1,50 @@
+#include "implementation.oil"
+
+CPU ATMEL_AT91SAM7S256
+{
+  OS LEJOS_OSEK
+  {
+    STATUS = EXTENDED;
+    STARTUPHOOK = FALSE;
+    ERRORHOOK = FALSE;
+    SHUTDOWNHOOK = FALSE;
+    PRETASKHOOK = FALSE;
+    POSTTASKHOOK = FALSE;
+    USEGETSERVICEID = FALSE;
+    USEPARAMETERACCESS = FALSE;
+    USERESSCHEDULER = FALSE;
+  };
+
+  /* Definition of application mode */
+  APPMODE appmode1{}; 
+
+  RESOURCE BluetoothResource 
+  {
+  	RESOURCEPROPERTY = STANDARD;
+  };
+
+
+  /* Definition of IdleTask */
+  TASK IdleTask
+  {
+   	AUTOSTART = TRUE 
+	{
+   		APPMODE = appmode1;
+   	};
+    PRIORITY = 1;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512; /* Stack size */ 
+
+	RESOURCE = BluetoothResource;
+  };
+
+  /* Definition of OSEK Alarm Counter */
+  COUNTER SysTimerCnt
+  {
+    MINCYCLE = 1;
+    MAXALLOWEDVALUE = 10000;
+    TICKSPERBASE = 1; /* One tick is equal to 1msec */ 
+  };
+
+};
