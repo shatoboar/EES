@@ -2,7 +2,7 @@
 #define BLUETOOTH_H
 
 #include <stdbool.h>
-#include "kernel.h"
+#include "ecrobot_interface.h"
 
 /**
  * @brief Will be called once when the NXT is initialising.
@@ -11,6 +11,15 @@
  * @return false if an error ocurred
  */
 bool bluetooth_init();
+
+/**
+ * @brief Will be always called in main loop by routine.
+ * Could also be called before bluetooth_init()!
+ * 
+ * @return true if everything worked
+ * @return false if an error ocurred
+ */
+bool bluetooth_poll();
 
 /**
  * @brief Waits and gets a signal via bluetooth (and returns an ACK) from PI that the NXT 

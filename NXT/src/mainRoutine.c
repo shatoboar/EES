@@ -260,6 +260,12 @@ TASK(MainTask) {
         static bool ok; //helper flag
         static U8 box; 
 
+        
+        ok = bluetooth_init();
+        if (ok) { //TODO
+
+        }
+
 
         switch(MODE) {
           case RESET_TASK:
@@ -382,6 +388,10 @@ TASK(MainTask) {
           break;
 
           case CALIBRATE_MOVE_LEFT_TASK:
+            ok = bluetooth_init();
+            if (ok) { //TODO
+
+            }
             
             TOUCH_SENSOR_LEFT_ACTIVATED = true;
             
