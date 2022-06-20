@@ -12,6 +12,7 @@
 
 #include "duties.h"
 #include "motor_helper.h"
+#include "bluetooth.h"
 
 DeclareCounter(SysTimerCnt);
 
@@ -256,6 +257,8 @@ TASK(MainTask) {
         static int max_box = 5; //TODO remove maybe
         static bool should_finish = false; //TODO remove
 
+        static bool ok; //helper flag
+
         switch(MODE) {
           case RESET_TASK:
             movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, -70); //reset pusher to idle
@@ -362,10 +365,14 @@ TASK(MainTask) {
             nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
             nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
 
-            //TO DO wait until next stone signal from bluetooth module is coming
-
-            //Throw stone the assembly line
-            MODE = THROW_STONE_ON_LINE_TASK;
+            //TODO wait until next stone signal from bluetooth module is coming
+            ok = bluetooth_rcv_next_stone_signal();
+            if (ok) {
+              //Throw stone the assembly line
+              MODE = THROW_STONE_ON_LINE_TASK;
+            } else {
+              MODE = ERROR_FATAL; //TODO maybe replace
+            }
           break;
 
           case CALIBRATE_MOVE_LEFT_TASK:
@@ -390,14 +397,21 @@ TASK(MainTask) {
             movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, 85); //push
             movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, -85); //and retreat
             
-            //TODO: Send signal to PI to send picture
-            MODE = TAKE_PICTURE_TASK;
+            //TODO: Send signal to PI to take picture
+            ok = bluetooth_send_next_picture_signal();
+            if (ok) {
+              MODE = TAKE_PICTURE_TASK;
+            } else {
+              MODE = ERROR_FATAL;
+            }
+            
           break;
 
           case TAKE_PICTURE_TASK:
             
             //TODO wait until signal from PI for correct box info
             
+
             //MOCK SIMULATION
             current_box_index++; //current_box_index is only for simulating PI data and will be removed later
             if (current_box_index >= max_box) {
