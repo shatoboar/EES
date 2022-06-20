@@ -15,53 +15,38 @@
 
 int main(int argc, char **argv)
 {
-
-	printf("Starting the program...\n");
-	struct sockaddr_rc addr = { 0 };
-	int s, status;
-	char dest[18] = "00:16:53:0F:77:72";
 	uint8_t recv_buf[4];
 	uint8_t send_buf[4];
-	// allocate a socket
-	s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-
-	// set the connection parameters (who to connect to)
-	addr.rc_family = AF_BLUETOOTH;
-	addr.rc_channel = (uint8_t) 1;
-	str2ba( dest, &addr.rc_bdaddr );
-
-	// connect to server
-	status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
-	// send a message
-	if(status == 0) {
-		printf("Connection successful\n");
-	} 
-
-
-	if(status==0){
-		marshal(send_buf, ACK, 0);
-		status = write(s,send_buf, 4);
+	int s = init_bluetooth();
+	int status;
+	int msg_type;
+	if(s!=-1){
+		uint8_t message_type = INIT;
+		uint8_t payload = 0;
+		status = send_msg(s, send_buf, message_type, payload);
 		printf("Sent!\n");
+		msg_type = receive_msg(s, recv_buf);
+		if(msg_type != ACK){
+			printf("Expected ACK but got something else back"); 
+		}
+		msg_type = receive_msg(s, recv_buf);
+		if(msg_type != INIT){
+			printf("Protocol Breach, expected INIT command"); 
+		}
+		else{
+			printf("We got %d buckets", recv_buf[1]);
+		}
+
+
 	}
 
 	//read data from the client
-	receive_msg(s, recv_buf);
 
 	if (status < 0) perror("uh oh");
 
 	close(s);
 	
 	return 0;
-}
-
-void printBits(uint8_t num)
-{
-	for(int bit=0;bit<(sizeof(uint8_t) * 8); bit++)
-	{
-		printf("%i ", num & 0x01);
-		num = num >> 1;
-	}
-
 }
 
 int unmarshal(uint8_t* recv_buf, int bytes_read){
@@ -82,7 +67,7 @@ int unmarshal(uint8_t* recv_buf, int bytes_read){
 
        	if ((uint8_t)recv_buf[0] != (uint8_t)~recv_buf[2]  || (uint8_t)recv_buf[1] != (uint8_t) ~recv_buf[3]){
 		printf("%d \n", ~recv_buf[0]);
-		printf("%d \n", ~recv_buf[2]); //TODO figure out why negations don't work
+		printf("%d \n", ~recv_buf[2]);
 	       	printf("Checksum Error! \n");
 	       	return -1;
        	}
@@ -98,7 +83,7 @@ void marshal(uint8_t* send_buf, uint8_t message_type, uint8_t payload){
 
 }
 	
-void receive_msg(int socket, uint8_t* recv_buf){
+int receive_msg(int socket, uint8_t* recv_buf){
 	int bytes_read;
 	while(bytes_read == 0){
 		bytes_read = read(socket, recv_buf, sizeof(recv_buf));
@@ -123,9 +108,44 @@ void receive_msg(int socket, uint8_t* recv_buf){
 			break;
 		default:
 			printf("Error while receiving message \n");
+			msg_type = -1;
 			break;
 	}
+	return msg_type;
 }
-void send_msg(int socket, uint8_t* send_buf, uint8_t message_type, uint8_t payload);
+int send_msg(int socket, uint8_t* send_buf, uint8_t message_type, uint8_t payload){
+	marshal(send_buf, message_type, payload);
+	int status = write(socket, send_buf,4);
+	return status;
+}
+
+int init_bluetooth(){
+	printf("Connecting to NXT...\n");
+	struct sockaddr_rc addr = { 0 };
+	int s, status;
+	//char dest[18] = "00:16:53:0F:77:72";
+	char dest[18] = "00:16:53:0F:82:9F";
+
+
+	// allocate a socket
+	s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+
+	// set the connection parameters (who to connect to)
+	addr.rc_family = AF_BLUETOOTH;
+	addr.rc_channel = (uint8_t) 1;
+	str2ba( dest, &addr.rc_bdaddr );
+
+	// connect to server
+	
+	status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
+	if(status == 0) {
+		printf("Connection successful\n");
+		return s;
+	} 
+	else{
+		printf("Connection Error\n");
+		return -1;
+	}
+}
 
 

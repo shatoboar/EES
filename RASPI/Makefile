@@ -1,4 +1,4 @@
 client:
-	gcc -g -o client client.c -lbluetooth
+	gcc -g -o client client.cpp -lbluetooth
 clean:
 	rm client
