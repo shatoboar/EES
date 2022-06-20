@@ -1,72 +1,39 @@
-//
-// Created by Timo Oeltze on 15.06.22.
-//
-
 #include "test_colordetection.h"
 #include "colordetection.h"
-#include <gtest/gtest.h>
 
-TEST(BlueBrickDetection, Detected) {
-    char filepath[] = "./picturesFinalPosition/blueBrickOnLineLeft.jpg";
-    ColorDetection newDetection(filepath);
-    EXPECT_EQ(newDetection.color_detection_result, Color_detected::blue);
-}
+bool colorTest(char* filePath, Color_detected expectation) {
+    ColorDetection newDetection(filePath);
 
-TEST(TwoBlueBricksDetection, Detected) {
-    char filepath[] = "./picturesFinalPosition/twoBlueOnLine.jpg";
-    ColorDetection newDetection(filepath);
-    EXPECT_EQ(newDetection.color_detection_result, Color_detected::blue);
-}
+    if (newDetection.color_detection_result != expectation) {
+        return false;
+    }
 
-TEST(RedBrickDetection, Detected) {
-    char filepath[] = "./picturesFinalPosition/redBrickOnLineLeft.jpg";
-    ColorDetection newDetection(filepath);
-    EXPECT_EQ(newDetection.color_detection_result, Color_detected::red);
-}
-
-TEST(TwoRedBricksDetection, Detected) {
-    char filepath[] = "./picturesFinalPosition/twoRedOnLine.jpg";
-    ColorDetection newDetection(filepath);
-    EXPECT_EQ(newDetection.color_detection_result, Color_detected::red);
-}
-
-TEST(GreenBrickDetection, Detected) {
-    char filepath[] = "./picturesFinalPosition/greenBrickOnLineLeft.jpg";
-    ColorDetection newDetection(filepath);
-    EXPECT_EQ(newDetection.color_detection_result, Color_detected::green);
-}
-
-TEST(TwoGreenBricksDetection, Detected) {
-    char filepath[] = "./picturesFinalPosition/twoGreenOnLine.jpg";
-    ColorDetection newDetection(filepath);
-    EXPECT_EQ(newDetection.color_detection_result, Color_detected::green);
-}
-
-TEST(YellowBrickDetection, Detected) {
-    char filepath[] = "./picturesFinalPosition/yellowBrickOnLineLeft.jpg";
-    ColorDetection newDetection(filepath);
-    EXPECT_EQ(newDetection.color_detection_result, Color_detected::yellow);
-}
-
-TEST(TwoYellowBricksDetection, Detected) {
-    char filepath[] = "./picturesFinalPosition/twoYellowOnLine.jpg";
-    ColorDetection newDetection(filepath);
-    EXPECT_EQ(newDetection.color_detection_result, Color_detected::yellow);
-}
-
-TEST(EmptyLine, Detected) {
-    char filepath[] = "./picturesFinalPosition/NothingOnLine.jpg";
-    ColorDetection newDetection(filepath);
-    EXPECT_EQ(newDetection.color_detection_result, Color_detected::no_object);
-}
-
-TEST(TwoDifferentBricks, Detected) {
-    char filepath[] = "./picturesFinalPosition/twobricksOnLine.jpg";
-    ColorDetection newDetection(filepath);
-    EXPECT_EQ(newDetection.color_detection_result, Color_detected::several_colors);
+    return true;
 }
 
 int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    int result = 0;
+    list<pair<char*, Color_detected>> testInput = {
+            pair<char*, Color_detected>("../picturesFinalPosition/blueBrickOnLineLeft.jpg", Color_detected::blue),
+            pair<char*, Color_detected>("../picturesFinalPosition/twoBlueOnLine.jpg", Color_detected::blue),
+            pair<char*, Color_detected>("../picturesFinalPosition/redBrickOnLineLeft.jpg", Color_detected::red),
+            pair<char*, Color_detected>("../picturesFinalPosition/twoRedOnLine.jpg", Color_detected::red),
+            pair<char*, Color_detected>("../picturesFinalPosition/greenBrickOnLineLeft.jpg", Color_detected::green),
+            pair<char*, Color_detected>("../picturesFinalPosition/twoGreenOnLine.jpg", Color_detected::green),
+            pair<char*, Color_detected>("../picturesFinalPosition/yellowBrickOnLineLeft.jpg", Color_detected::yellow),
+            pair<char*, Color_detected>("../picturesFinalPosition/twoYellowOnLine.jpg", Color_detected::yellow),
+            pair<char*, Color_detected>("../picturesFinalPosition/NothingOnLine.jpg", Color_detected::no_object),
+            pair<char*, Color_detected>("../picturesFinalPosition/twobricksOnLine.jpg", Color_detected::several_colors)
+    };
+
+    for (pair<char*, Color_detected> test : testInput) {
+        if(!colorTest(test.first, test.second)) {
+            cout << "Test for file: " << test.first << " failed /n";
+            result++;
+        }
+    }
+
+    cout << "\n -------- Number of tests: " << testInput.size() << ", tests failed: " << result << " -------- \n";
+
+    return result;
 }
