@@ -66,7 +66,7 @@ TEST(TwoDifferentBricks, Detected) {
     EXPECT_EQ(newDetection.color_detection_result, Color_detected::several_colors);
 }
 
-
-
-
-
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

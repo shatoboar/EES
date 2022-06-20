@@ -1,6 +1,5 @@
 #include <colordetection.h>
 #include <iostream>
-#include <string.h>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -169,7 +168,7 @@ ColorDetection::ColorDetection(char* filename) {
     }
 }
 
-/*int main(int argc, char* argv[]){
+int main(int argc, char* argv[]){
     ColorDetection new_detection(argv[1]);
     switch(new_detection.color_detection_result){
         case Color_detected::red:
@@ -193,4 +192,4 @@ ColorDetection::ColorDetection(char* filename) {
     }
 
     show(new_detection.img, new_detection.red_counter, new_detection.green_counter, new_detection.blue_counter, new_detection.yellow_counter, new_detection);
-}*/
+}
