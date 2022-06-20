@@ -15,3 +15,4 @@ raspi/colorDetection/cmake-build-debug
 CMakeFiles
 kernel_id.h
 kernel_cfg.c
+implementation.oil
