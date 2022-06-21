@@ -450,8 +450,12 @@ TASK(MainTask) {
             }
             //set next target
             GetResource(ResourceExecuteCommand);
-            //TODO remove !should_finish
-            if (!should_finish) NEXT_BOX_TARGET = boxes[current_box_index]; 
+            
+            if (!should_finish) NEXT_BOX_TARGET = boxes[current_box_index]; //TODO remove
+
+            //BLUETOOTH  IMPLEMENTATION, TODO remove !should_finish
+            if (!should_finish) NEXT_BOX_TARGET = box;
+
             ReleaseResource(ResourceExecuteCommand);
 
             MODE = CALC_NEXT_BOX_POSITION_TASK;

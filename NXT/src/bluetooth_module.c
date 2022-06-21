@@ -19,7 +19,7 @@ bool bluetooth_send_next_picture_signal() {
 }
 
 U8 bluetooth_rcv_sort_in_box_signal() {
-    return 0;
+    return 1;
 }
 
 bool bluetooth_send_stone_sorted_signal() {
