@@ -14,7 +14,6 @@
 int main(int argc, char **argv)
 {
 	uint8_t recv_buf[4];
-	uint8_t recv_buf_2[4];
 	uint8_t send_buf[4];
 	int s = init_bluetooth();
 	int status;
@@ -23,24 +22,18 @@ int main(int argc, char **argv)
 	{
 		uint8_t message_type = INIT;
 		uint8_t payload = 0;
-		status = send_msg(s, send_buf, message_type, payload);
-		printf("Sent!\n");
-		msg_type = receive_msg(s, recv_buf);
-		if (msg_type != ACK)
-		{
-			printf("Expected ACK but got something else back\n");
-		}
-		msg_type = receive_msg(s, recv_buf_2);
+		status = send_msg(s, send_buf, recv_buf, message_type, payload);
+		msg_type = receive_msg(s, recv_buf, send_buf);
 		if (msg_type != INIT)
 		{
 			printf("Protocol Breach, expected INIT command\n");
 		}
 		else
 		{
-			printf("We got %d buckets \n", recv_buf_2[1]);
+			printf("We got %d buckets \n", recv_buf[1]);
 			message_type = ACK;
 			payload = 0;
-			status = send_msg(s, send_buf, message_type, payload);
+			status = send_msg(s, send_buf, recv_buf, message_type, payload);
 		}
 	}
 
@@ -79,26 +72,7 @@ int unmarshal(uint8_t *recv_buf, int bytes_read)
 		printf("Checksum Error! \n");
 		return -1;
 	}
-	return recv_buf[0];
-}
-
-void marshal(uint8_t *send_buf, uint8_t message_type, uint8_t payload)
-{
-	send_buf[0] = message_type;
-	send_buf[1] = payload;
-	send_buf[2] = ~send_buf[0];
-	send_buf[3] = ~send_buf[1];
-}
-
-int receive_msg(int socket, uint8_t *recv_buf)
-{
-	int bytes_read = 0;
-	while (bytes_read == 0)
-	{
-		bytes_read = read(socket, recv_buf, sizeof(recv_buf));
-		sleep(1);
-	}
-	int msg_type = unmarshal(recv_buf, bytes_read);
+	int msg_type = recv_buf[0];
 	switch (msg_type)
 	{
 	case ACK:
@@ -123,11 +97,63 @@ int receive_msg(int socket, uint8_t *recv_buf)
 	}
 	return msg_type;
 }
-int send_msg(int socket, uint8_t *send_buf, uint8_t message_type, uint8_t payload)
+
+void marshal(uint8_t *send_buf, uint8_t message_type, uint8_t payload)
+{
+	send_buf[0] = message_type;
+	send_buf[1] = payload;
+	send_buf[2] = ~send_buf[0];
+	send_buf[3] = ~send_buf[1];
+}
+
+int receive_msg(int socket, uint8_t *recv_buf, uint8_t *send_buf)
+{
+	int bytes_read = 0;
+	int status =0;
+	while (bytes_read == 0)
+	{
+		bytes_read = read(socket, recv_buf, sizeof(recv_buf));
+		sleep(1);
+	}
+	int msg_type = unmarshal(recv_buf, bytes_read);
+	if(msg_type == -1){
+		marshal(send_buf, MSG_RESEND, 0);
+	}
+	else{
+		marshal(send_buf, ACK, 0);
+	}
+	
+	status = write(socket, send_buf, 4);
+	if(status == 0){
+		printf("Msg sent succesfully\n");
+	}
+	return msg_type;
+	
+}
+int send_msg(int socket, uint8_t *send_buf, uint8_t *recv_buf, uint8_t message_type, uint8_t payload)
 {
 	marshal(send_buf, message_type, payload);
 	int status = write(socket, send_buf, 4);
-	return status;
+	int bytes_read = 0;
+	while (bytes_read == 0)
+	{
+		bytes_read = read(socket, recv_buf, sizeof(recv_buf));
+		sleep(1);
+	}
+	int msg_type = unmarshal(recv_buf, bytes_read);
+	if(msg_type==ACK){
+		return status;		
+	}
+	else if(msg_type==MSG_RESEND){
+		send_msg(socket, send_buf, recv_buf, message_type, payload);
+		return status;
+	}
+	else{
+		printf("Unexpected Message type received, expected ack.\n");
+		return -1;
+	}
+
+
 }
 
 int init_bluetooth()
