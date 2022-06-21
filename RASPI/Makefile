@@ -1,4 +1,4 @@
 client:
-	gcc -g -o client client.cpp -lbluetooth
+	gcc -g -o BluetoothService BluetoothService.cpp -lbluetooth
 clean:
-	rm client
+	rm BluetoothService
