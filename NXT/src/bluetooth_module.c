@@ -151,6 +151,7 @@ U8 recv(int expectedCmd) {
 
             U8 message_type = bt_recv_buf[0];
             U8 message_payload  = bt_recv_buf[1];
+            BLUETOOTH_DEBUG = message_type;
 
             // received message type wasn't what we expected send back error
             if (message_type != expectedCmd) { 
@@ -170,14 +171,18 @@ U8 recv(int expectedCmd) {
 // ATTENTION: this needs to be implemented in a loop 
 // call this function inside ecrobot_device_initialize
 bool bluetooth_init(int numOfBuckets) {
+    BLUETOOTH_DEBUG = 1;
     recv(INIT); // we can ignore the payload, since the init command from the pi should have any payload
     systick_wait_ms(500); 
     send(INIT, numOfBuckets);
+    BLUETOOTH_DEBUG = 2;
     return true;
 }
 
 bool bluetooth_rcv_next_stone_signal() {
+    BLUETOOTH_DEBUG = 7; //TODO remove, for test debug
     recv(DEPLOY_ITEM);
+    BLUETOOTH_DEBUG = 6;
     send(DEPLOY_ITEM, 0); // this should actually happen after deployement is successful
     return true;
 }
@@ -195,4 +200,8 @@ U8 bluetooth_rcv_sort_in_box_signal() {
 bool bluetooth_send_stone_sorted_signal() {
     send(PREDICTED_BNR,0);
     return true;
+}
+
+int bluetooth_get_debug_int() {
+    return BLUETOOTH_DEBUG;
 }
