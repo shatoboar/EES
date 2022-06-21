@@ -13,7 +13,8 @@
 
 
 int BluetoothService::InitRoutine()
-{
+{	
+	printf("Starting INIT Routine...\n");
 	int status;
 	int msg_type;
 	int buckets = -1;
@@ -31,10 +32,7 @@ int BluetoothService::InitRoutine()
 		{
 			buckets = recv_buf[1];
 			printf("We got %d buckets \n", buckets);
-			message_type = ACK;
-			payload = 0;
-			status = send_msg(s, send_buf, recv_buf, message_type, payload);
-		}
+			}
 	}
 	if(buckets < 0){
 		printf("Amount of buckets wrong...\n");
@@ -129,6 +127,10 @@ int BluetoothService::send_msg(int socket, uint8_t* send_buf, uint8_t* recv_buf,
 {
 	marshal(send_buf, message_type, payload);
 	int status = write(socket, send_buf, 4);
+	if(status == 0){
+		printf("MSG sent!\n");
+	}
+
 	int bytes_read = 0;
 	while (bytes_read == 0)
 	{
@@ -137,11 +139,12 @@ int BluetoothService::send_msg(int socket, uint8_t* send_buf, uint8_t* recv_buf,
 	}
 	int msg_type = unmarshal(recv_buf, bytes_read);
 	if(msg_type==ACK){
-		return status;		
+		return 0;		
 	}
 	else if(msg_type==MSG_RESEND){
+		printf("MSG_RESEND received!! Resending...\n");
 		send_msg(socket, send_buf, recv_buf, message_type, payload);
-		return status;
+		return 0;
 	}
 	else{
 		printf("Unexpected Message type received, expected ack.\n");
@@ -153,7 +156,7 @@ BluetoothService::BluetoothService()
 {
 	printf("Connecting to NXT...\n");
 	struct sockaddr_rc addr = {0};
-	int s, status;
+	int status;
 	char dest[18] = "00:16:53:0F:77:72";
 	//char dest[18] = "00:16:53:0F:82:9F";
 

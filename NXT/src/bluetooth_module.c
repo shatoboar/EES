@@ -178,7 +178,7 @@ bool bluetooth_init(int numOfBuckets) {
 
 bool bluetooth_rcv_next_stone_signal() {
     recv(DEPLOY_ITEM);
-    send(DEPLOY_ITEM); // this should actually happen after deployement is successful
+    send(DEPLOY_ITEM, 0); // this should actually happen after deployement is successful
     return true;
 }
 
@@ -193,6 +193,6 @@ U8 bluetooth_rcv_sort_in_box_signal() {
 }
 
 bool bluetooth_send_stone_sorted_signal() {
-    send(PREDICTED_BNR);
+    send(PREDICTED_BNR,0);
     return true;
 }
