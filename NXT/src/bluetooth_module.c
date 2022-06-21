@@ -183,6 +183,7 @@ bool bluetooth_rcv_next_stone_signal() {
     BLUETOOTH_DEBUG = 7; //TODO remove, for test debug
     recv(DEPLOY_ITEM);
     BLUETOOTH_DEBUG = 6;
+    systick_wait_ms(500);
     send(DEPLOY_ITEM, 0); // this should actually happen after deployement is successful
     return true;
 }
