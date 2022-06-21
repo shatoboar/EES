@@ -204,8 +204,8 @@ TASK(LCDTask)
 
     GetResource(ResourceMainRobot);
     display_goto_xy(0, 1);
-    display_string("ERRORcBoxes:");
-    display_int(ERROR_COUNTED_BOXES, 4);
+    display_string("BLT Debug:");
+    display_int(bluetooth_get_debug_int(), 4);
 
 
     display_goto_xy(0, 2);
@@ -268,12 +268,18 @@ TASK(MainTask) {
         static U8 box; 
 
 
+/*
         ok = bluetooth_init(4);
         if (ok) { //TODO
             display_string("Hey it worked");
             display_update();
-        }
+        }*/
+        
+        ok = bluetooth_poll();
+        if (ok) { //TODO
 
+        }
+        ok = false;
 
         switch(MODE) {
             case RESET_TASK:
@@ -402,8 +408,14 @@ TASK(MainTask) {
                 nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
                 nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
 
+                ok = bluetooth_init(4);
+                if (ok) { //TODO
+
+                }
+
                 //TODO wait until next stone signal from bluetooth module is coming
                 ok = bluetooth_rcv_next_stone_signal();
+
                 if (ok) {
                     //Throw stone the assembly line
                     MODE = THROW_STONE_ON_LINE_TASK;
@@ -413,10 +425,7 @@ TASK(MainTask) {
                 break;
 
             case CALIBRATE_MOVE_LEFT_TASK:
-                ok = bluetooth_init(4);
-                if (ok) { //TODO
 
-                }
 
                 TOUCH_SENSOR_LEFT_ACTIVATED = true;
 
@@ -451,7 +460,7 @@ TASK(MainTask) {
             case TAKE_PICTURE_TASK:
 
                 //TODO wait until signal from PI for correct box info
-                box = bluetooth_rcv_next_stone_signal();
+                box = bluetooth_rcv_sort_in_box_signal();
 
                 //MOCK SIMULATION TODO remove
                 current_box_index++; //current_box_index is only for simulating PI data and will be removed later
