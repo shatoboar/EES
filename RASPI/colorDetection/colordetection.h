@@ -25,7 +25,7 @@ typedef enum class Color_detected
 
 typedef enum class Size_detected
 {
-    two_times_two, two_times_three, two_times_four, serveral_sizes, unknown_sizes
+    two_times_two, two_times_three, two_times_four, serveral_sizes, unknown_sizes, no_bricks
 }Size_detected;
 
 class ColorDetection {
@@ -39,12 +39,16 @@ public:
     bool green_brick = false;
     bool blue_brick = false;
     bool yellow_brick = false;
+    bool two_four_brick = false;
+    bool two_three_brick = false;
+    bool two_two_brick = false;
+    bool unknown_size_brick = false;
     bool red_brick_only_one;
     bool green_brick_only_one;
     bool blue_brick_only_one;
     bool yellow_brick_only_one;
     Color_detected color_detection_result;
-    Size_detected size_detection_resul;
+    Size_detected size_detection_result;
     Scalar red_lower = Scalar(136, 87, 111);
     Scalar red_upper = Scalar(180, 255, 255);
     Scalar green_lower = Scalar(36, 25, 25);

@@ -32,16 +32,54 @@ vector<Point> detect_max_color(Mat mask, Color search_color, ColorDetection *c) 
     vector<cv::Point> large_contour;
     findContours( mask, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
     int object_counter = 0;
+    int object_counter_two_four  = 0;
+    int object_counter_two_three = 0;
+    int object_counter_two_two = 0;
 
     for(int i = 0; i < contours.size(); i++){
         int area = (int)cv::contourArea(contours[i]);
-        if (area > 20000) {
+        if(150000 <= area && area < 300000){
             object_counter++;
+            c->two_two_brick = true;
+            if(area > max_area){
+                large_contour = contours[i];
+            }
+            max_area = area;
+        }else if(300000 <= area && area < 400000){
+            object_counter++;
+            c->two_three_brick = true;
+            if(area > max_area){
+                    large_contour = contours[i];
+            }
+                max_area = area;
+        }else if(400000 <= area && area <  550000){
+            object_counter++;
+            c->two_four_brick = true;
+            if(area > max_area){
+                    large_contour = contours[i];
+            }
+                max_area = area;
+        }else if(area > 20000){
+            object_counter++;
+            c->unknown_size_brick = true;
+            if(area > max_area){
+                    large_contour = contours[i];
+            }
+                max_area = area;
+        }
+    }
+
+    /*for(int i = 0; i < contours.size(); i++){
+        int area = (int)cv::contourArea(contours[i]);
+        if (area > 20000) {
+            cout << "area value: " << area << " \n";
+            object_counter_two_four ++;
             if(area> max_area)
                 large_contour = contours[i];
             max_area = area;
         }
-    }
+    }*/
+
     if(object_counter > 0){
         switch(search_color){
             case Color::red:
@@ -150,6 +188,22 @@ ColorDetection::ColorDetection(char* filename) {
     green_counter = detect_max_color(green_mask, green_c, this);
     blue_counter = detect_max_color(blue_mask, blue_c, this);
     yellow_counter = detect_max_color(yellow_mask, yellow_c, this);
+
+    if(two_four_brick != two_three_brick != two_two_brick){
+        if(two_four_brick){
+            size_detection_result = Size_detected::two_times_four;
+        }else if(two_three_brick){
+            size_detection_result = Size_detected::two_times_three;
+        }else if(two_two_brick){
+            size_detection_result = Size_detected::two_times_two;
+        }
+    }else if(unknown_size_brick){
+        size_detection_result = Size_detected::unknown_sizes;
+    }else if(!two_two_brick && !two_three_brick && !two_four_brick){
+        size_detection_result = Size_detected ::no_bricks;
+    }else{
+        size_detection_result = Size_detected::serveral_sizes;
+    }
 
     if(red_brick != green_brick != blue_brick != yellow_brick){
         if(red_brick){

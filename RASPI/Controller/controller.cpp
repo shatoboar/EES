@@ -38,12 +38,50 @@ bool readyForNewObject() {
 }*/
 
 int main(int argc, char* argv[]){
-    Controller newController;
+    /*Controller newController;
     newController.buckets = init_ps();
     newController.hasConnection = hasConnection(newController.buckets);
 
     if (newController.hasConnection) {
         //mainRoutine(newController);
+    }*/
+    ColorDetection new_detection(argv[1]);
+    switch(new_detection.color_detection_result){
+        case Color_detected::red:
+            cout << "Red Brick on Line\n";
+            break;
+        case Color_detected::green:
+            cout << "Green Brick on Line\n";
+            break;
+        case Color_detected::blue:
+            cout << "Blue Brick on Line\n";
+            break;
+        case Color_detected::yellow:
+            cout << "Yellow Brick on Line\n";
+            break;
+        case Color_detected::no_object:
+            cout << "No detected colour on Line\n";
+            break;
+        case Color_detected::several_colors:
+            cout << "Several Colors on Line\n";
+            break;
+    }
+    switch (new_detection.size_detection_result) {
+        case Size_detected::two_times_four:
+            cout << "2x4 detected\n";
+            break;
+        case Size_detected::two_times_three:
+            cout << "2x3 detected\n";
+            break;
+        case Size_detected::two_times_two:
+            cout << "2x2 detected\n";
+            break;
+        case Size_detected::serveral_sizes:
+            cout << "More than 1 size detected\n";
+            break;
+        case Size_detected::no_bricks:
+            cout << "No bricks on line\n";
+            break;
     }
 }
 
