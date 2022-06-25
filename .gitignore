@@ -3,7 +3,16 @@
 *.bin
 *.rxe
 *.map
+*.json
+*.DS_Store
+CMakeCache.txt
 build
+*.cmake
+.idea
+CMakeFiles
+cmake-build-debug
+raspi/colorDetection/cmake-build-debug
+CMakeFiles
 kernel_id.h
 kernel_cfg.c
 implementation.oil

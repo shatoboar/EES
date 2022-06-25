@@ -32,22 +32,23 @@ DeclareResource(ResourceExecuteCommand);
 #define READY_FOR_STONE_TASK                  4
 #define CALC_NEXT_BOX_POSITION_TASK           5
 #define THROW_STONE_ON_LINE_TASK              6
-#define TAKE_PICTURE_TASK                     7
-#define CALIBRATE_MOVE_LEFT_TASK              8
-#define ERROR_LIGHT                           9
+#define GO_TO_DISPENSER_TASK                  7
+#define TAKE_PICTURE_TASK                     8
+#define CALIBRATE_MOVE_LEFT_TASK              9
+#define ERROR_LIGHT                           10
 /**
  * Starts the error correction calibrate phase.
  * The robot will drive to the right side until a bumber stone was hit, the to the left and count the stones.
  * If the number of counted calibration stones are correct and the left bumber stone was hit, everything is ok again.
  * Timeout of 4s in which a calibration has to be found, otherwise it will go into the ERROR_FATAL state.
  */
-#define ERROR_CORRECTION_CALIBRATE_START            10  
-#define ERROR_CORRECTION_CALIBRATE_RIGHT            11 //entered after error_correction_calibrate_start, will enter _calibrate_left
-#define ERROR_CORRECTION_CALIBRATE_LEFT             12 //drives to the left and counts the stones
-#define ERROR_CORRECTION_CALIBRATE_LEFT_TMP         13 //tmp move if a calibration stone was detected
-#define ERROR_CORRECTION_CALIBRATE_LEFT_STONE_BUMP  14 //stones counted are correct, now a left bumber stone is expected
-#define ERROR_FATAL                                 15
-#define IDLE_TASK                                   16
+#define ERROR_CORRECTION_CALIBRATE_START            11  
+#define ERROR_CORRECTION_CALIBRATE_RIGHT            12 //entered after error_correction_calibrate_start, will enter _calibrate_left
+#define ERROR_CORRECTION_CALIBRATE_LEFT             13 //drives to the left and counts the stones
+#define ERROR_CORRECTION_CALIBRATE_LEFT_TMP         14 //tmp move if a calibration stone was detected
+#define ERROR_CORRECTION_CALIBRATE_LEFT_STONE_BUMP  15 //stones counted are correct, now a left bumber stone is expected
+#define ERROR_FATAL                                 16
+#define IDLE_TASK                                   17
 
 #define MOTOR_ASSEMBLY_LINE         NXT_PORT_A
 #define MOTOR_MOVE                  NXT_PORT_B
@@ -203,8 +204,8 @@ TASK(LCDTask)
 
     GetResource(ResourceMainRobot);
     display_goto_xy(0, 1);
-    display_string("ERRORcBoxes:");
-    display_int(ERROR_COUNTED_BOXES, 4);
+    display_string("BLT Debug:");
+    display_int(bluetooth_get_debug_int(), 4);
 
 
     display_goto_xy(0, 2);
@@ -258,7 +259,7 @@ TASK(MainTask) {
         static bool shouldSetSpeed = true;
 
         //for simulating the raspberry pi
-        static int boxes[] = {2, 3, 1, 3, 0}; //simulate data from raspberry pi TODO remove
+        static int boxes[] = {0, 3, 2, 1, 0}; //simulate data from raspberry pi TODO remove
         static int current_box_index = -1; //-1 is init TODO remove
         static int max_box = 5; //TODO remove maybe
         static bool should_finish = false; //TODO remove
@@ -267,12 +268,18 @@ TASK(MainTask) {
         static U8 box; 
 
 
+/*
         ok = bluetooth_init(4);
         if (ok) { //TODO
             display_string("Hey it worked");
             display_update();
-        }
+        }*/
+        
+        ok = bluetooth_poll();
+        if (ok) { //TODO
 
+        }
+        ok = false;
 
         switch(MODE) {
             case RESET_TASK:
@@ -358,14 +365,31 @@ TASK(MainTask) {
                     DIRECTION = 0;
                     MODE = THROW_STONE_TASK;
                 }
-
+            
                 ReleaseResource(ResourceMainRobot);
                 ReleaseResource(ResourceExecuteCommand);
                 break;
 
 
 
+
+          case GO_TO_DISPENSER_TASK:
+            TOUCH_SENSOR_LEFT_ACTIVATED = true;
+            
+            nxt_motor_set_speed(MOTOR_MOVE, -100, 1);
+
+            if (ecrobot_get_touch_sensor(SENSOR_TOUCH_LEFT)) {
+              nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
+              movesDegrees(MOTOR_MOVE, 50, 100); //move back
+              TOUCH_SENSOR_LEFT_ACTIVATED = false;
+              CURRENT_BOX = 0;
+              MODE = THROW_STONE_ON_LINE_TASK;
+            }
+          break;
+
+
             case TMP_MOVE_TASK:
+
 
                 if (shouldSetSpeed) {     
                     movesDegrees(MOTOR_MOVE, 270, 95 * DIRECTION);
@@ -374,7 +398,7 @@ TASK(MainTask) {
 
                 shouldSetSpeed = true;
                 MODE = MOVE_TO_BOX_TASK;
-                break;
+             break;
 
 
             case READY_FOR_STONE_TASK:
@@ -384,8 +408,14 @@ TASK(MainTask) {
                 nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
                 nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
 
+                ok = bluetooth_init(4);
+                if (ok) { //TODO
+
+                }
+
                 //TODO wait until next stone signal from bluetooth module is coming
                 ok = bluetooth_rcv_next_stone_signal();
+
                 if (ok) {
                     //Throw stone the assembly line
                     MODE = THROW_STONE_ON_LINE_TASK;
@@ -395,10 +425,7 @@ TASK(MainTask) {
                 break;
 
             case CALIBRATE_MOVE_LEFT_TASK:
-                ok = bluetooth_init(4);
-                if (ok) { //TODO
 
-                }
 
                 TOUCH_SENSOR_LEFT_ACTIVATED = true;
 
@@ -433,7 +460,7 @@ TASK(MainTask) {
             case TAKE_PICTURE_TASK:
 
                 //TODO wait until signal from PI for correct box info
-                box = bluetooth_rcv_next_stone_signal();
+                box = bluetooth_rcv_sort_in_box_signal();
 
                 //MOCK SIMULATION TODO remove
                 current_box_index++; //current_box_index is only for simulating PI data and will be removed later
@@ -445,6 +472,10 @@ TASK(MainTask) {
                 GetResource(ResourceExecuteCommand);
                 //TODO remove !should_finish
                 if (!should_finish) NEXT_BOX_TARGET = boxes[current_box_index]; 
+                
+                //BLUETOOTH  IMPLEMENTATION, TODO remove !should_finish
+                if (!should_finish) NEXT_BOX_TARGET = box;
+                
                 ReleaseResource(ResourceExecuteCommand);
 
                 MODE = CALC_NEXT_BOX_POSITION_TASK;

@@ -187,7 +187,8 @@ bool bluetooth_rcv_next_stone_signal() {
 }
 
 bool bluetooth_send_next_picture_signal() {
-    send(DEPLOY_ITEM, 0); // this means that the deployment was successful, and we can take the picture now
+    send(DEPLOY_ITEM, 0); // this means that the deployment was successful, and we can take the picture now
+
     return true;
 }
 
@@ -204,4 +205,3 @@ bool bluetooth_send_stone_sorted_signal() {
 
 int bluetooth_get_debug_int() {
     return BLUETOOTH_DEBUG;
-}

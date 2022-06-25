@@ -36,6 +36,8 @@
 // get box number       | pi -> nxt
 // nxt ready            | nxt -> pi
 
+int BLUETOOTH_DEBUG = 0; //will be displayed on LCD for debugging information
+
 /**
  * @brief Will be called during initialization
  * @param numOfBuckets, sends how many buckets we have.
@@ -96,4 +98,10 @@ U8 bluetooth_rcv_sort_in_box_signal();
  */
 bool bluetooth_send_stone_sorted_signal();
 
+/**
+ * @brief Will return BLUETOOTH_DEBUG, this will be displayed on the LCD for debugging.
+ * 
+ * @return int 
+ */
+int bluetooth_get_debug_int();
 #endif //BLUETOOTH_H
