@@ -152,7 +152,7 @@ int BluetoothService::receive_msg(int socket, uint8_t* recv_buf, uint8_t* send_b
 	while (bytes_read == 0)
 	{
 		bytes_read = read(socket, recv_buf, sizeof(recv_buf));
-		sleep(1);
+		sleep(0.5);
 	}
 	int msg_type = unmarshal(recv_buf, bytes_read);
 	if(msg_type == -1){
@@ -175,7 +175,7 @@ int BluetoothService::send_msg(int socket, uint8_t* send_buf, uint8_t* recv_buf,
 	while (bytes_read == 0)
 	{
 		bytes_read = read(socket, recv_buf, sizeof(recv_buf));
-		sleep(1);
+		sleep(0.5);
 	}
 	int msg_type = unmarshal(recv_buf, bytes_read);
 	if(msg_type==ACK){
@@ -234,9 +234,9 @@ int main(int argc, char **argv)
 	BluetoothService bt;
 	int buckets = bt.InitRoutine();
 	printf("%d Buckets in Main \n", buckets);
-	sleep(5);
+	// sleep(5);
 	bt.DeployRoutine();
-
+	bt.SendClassificationRoutine(2);
 
 	bt.CloseConnection();
 
