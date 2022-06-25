@@ -15,6 +15,8 @@ public:
     int send_msg(int socket, uint8_t* send_buf, uint8_t* recv_buf, uint8_t message_type, uint8_t payload);
     void CloseConnection();
     int InitRoutine();
+    void DeployRoutine();
+    void SendClassificationRoutine(int classification);
 };
 
 

@@ -40,6 +40,51 @@ int BluetoothService::InitRoutine()
 	return buckets;
 }
 
+void BluetoothService::SendClassificationRoutine(int classification)
+{	
+	printf("Starting PREDICTED_BUCKET Routine...\n");
+	int status;
+	int msg_type;
+	if (s != -1)
+	{
+		uint8_t message_type = PREDICTED_BUCKET;
+		uint8_t payload = classification;
+		status = send_msg(s, send_buf, recv_buf, message_type, payload);
+		msg_type = receive_msg(s, recv_buf, send_buf);
+		if (msg_type != PREDICTED_BUCKET)
+		{
+			printf("Protocol Breach, expected PREDICTED_BUCKET command\n");
+		}
+		else
+		{
+			printf("Classification done and ready \n");
+		}
+	}
+}
+
+void BluetoothService::DeployRoutine()
+{
+	printf("Starting DEPLOY Routine...\n");
+	int status;
+	int msg_type;
+	if (s != -1)
+	{
+		uint8_t message_type = DEPLOY_SIGNAL;
+		uint8_t payload = 0;
+		status = send_msg(s, send_buf, recv_buf, message_type, payload);
+		msg_type = receive_msg(s, recv_buf, send_buf);
+		if (msg_type != DEPLOY_SIGNAL)
+		{
+			printf("Protocol Breach, expected DEPLOY command\n");
+		}
+		else
+		{
+			printf("Stone ready for scan! bzzzzp...\n");
+		}
+	}
+
+}
+
 int BluetoothService::unmarshal(uint8_t *recv_buf, int bytes_read)
 {
 	if (bytes_read != 4)
@@ -107,7 +152,7 @@ int BluetoothService::receive_msg(int socket, uint8_t* recv_buf, uint8_t* send_b
 	while (bytes_read == 0)
 	{
 		bytes_read = read(socket, recv_buf, sizeof(recv_buf));
-		sleep(1);
+		sleep(0.5);
 	}
 	int msg_type = unmarshal(recv_buf, bytes_read);
 	if(msg_type == -1){
@@ -116,26 +161,21 @@ int BluetoothService::receive_msg(int socket, uint8_t* recv_buf, uint8_t* send_b
 	else{
 		marshal(send_buf, ACK, 0);
 	}
-	
 	status = write(socket, send_buf, 4);
-	if(status == 0){
-		printf("ACK sent!\n");
-	}
+	printf("%d sent! Status: %d\n", send_buf[0], status);
 	return msg_type;
 }
 int BluetoothService::send_msg(int socket, uint8_t* send_buf, uint8_t* recv_buf, uint8_t message_type, uint8_t payload)
 {
 	marshal(send_buf, message_type, payload);
 	int status = write(socket, send_buf, 4);
-	if(status == 0){
-		printf("MSG sent!\n");
-	}
+	printf("MSG %d sent! Status %d\n", send_buf[0], status);
 
 	int bytes_read = 0;
 	while (bytes_read == 0)
 	{
 		bytes_read = read(socket, recv_buf, sizeof(recv_buf));
-		sleep(1);
+		sleep(0.5);
 	}
 	int msg_type = unmarshal(recv_buf, bytes_read);
 	if(msg_type==ACK){
@@ -193,7 +233,11 @@ int main(int argc, char **argv)
 
 	BluetoothService bt;
 	int buckets = bt.InitRoutine();
-	printf("%d Buckets in Main", buckets);
+	printf("%d Buckets in Main \n", buckets);
+	// sleep(5);
+	bt.DeployRoutine();
+	bt.SendClassificationRoutine(2);
+
 	bt.CloseConnection();
 
 	return 0;

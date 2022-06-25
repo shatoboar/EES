@@ -100,8 +100,7 @@ U8 send(U8 type, U8 payload) {
             {
                 case ACK: 
                     // we need to listen for the payload and send back an acknowledgement
-                    first = false;
-                    continue;
+                    break;
                 case ERROR:
                     // resend old message, since they have sent back an error
                     marshal(bt_send_buf, type, payload);
@@ -182,12 +181,14 @@ bool bluetooth_init(int numOfBuckets) {
 bool bluetooth_rcv_next_stone_signal() {
     BLUETOOTH_DEBUG = 7; //TODO remove, for test debug
     recv(DEPLOY_ITEM);
+    systick_wait_ms(500); 
     BLUETOOTH_DEBUG = 6;
-    send(DEPLOY_ITEM, 0); // this should actually happen after deployement is successful
     return true;
 }
 
 bool bluetooth_send_next_picture_signal() {
+    send(DEPLOY_ITEM, 0); // this means that the deployment was successful, and we can take the picture now
+
     return true;
 }
 
