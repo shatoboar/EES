@@ -205,3 +205,4 @@ bool bluetooth_send_stone_sorted_signal() {
 
 int bluetooth_get_debug_int() {
     return BLUETOOTH_DEBUG;
+}
