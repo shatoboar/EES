@@ -183,11 +183,12 @@ bool bluetooth_rcv_next_stone_signal() {
     recv(DEPLOY_ITEM);
     systick_wait_ms(500); 
     BLUETOOTH_DEBUG = 6;
-    send(DEPLOY_ITEM, 0); // this should actually happen after deployement is successful
     return true;
 }
 
 bool bluetooth_send_next_picture_signal() {
+    send(DEPLOY_ITEM, 0); // this means that the deployment was successful, and we can take the picture now
+
     return true;
 }
 
