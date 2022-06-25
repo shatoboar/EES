@@ -16,6 +16,7 @@ public:
     void CloseConnection();
     int InitRoutine();
     void DeployRoutine();
+    void SendClassificationRoutine(int classification);
 };
 
 

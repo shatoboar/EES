@@ -40,6 +40,28 @@ int BluetoothService::InitRoutine()
 	return buckets;
 }
 
+void BluetoothService::SendClassificationRoutine(int classification)
+{	
+	printf("Starting PREDICTED_BUCKET Routine...\n");
+	int status;
+	int msg_type;
+	if (s != -1)
+	{
+		uint8_t message_type = PREDICTED_BUCKET;
+		uint8_t payload = classification;
+		status = send_msg(s, send_buf, recv_buf, message_type, payload);
+		msg_type = receive_msg(s, recv_buf, send_buf);
+		if (msg_type != PREDICTED_BUCKET)
+		{
+			printf("Protocol Breach, expected PREDICTED_BUCKET command\n");
+		}
+		else
+		{
+			printf("Classification done and ready \n");
+		}
+	}
+}
+
 void BluetoothService::DeployRoutine()
 {
 	printf("Starting DEPLOY Routine...\n");
