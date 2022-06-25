@@ -4,13 +4,48 @@
 #include <stdbool.h>
 #include "ecrobot_interface.h"
 
+#define RUNTIME_CONNECTION
+
+// send when error occurs
+#define ERROR           255
+
+// sent as acknowledgement
+#define ACK             1
+
+// sent during initialization
+#define INIT            2
+
+// pi -> nxt
+//      deploy a new stone onto the line
+//      Messagecontent: empty
+// nxt -> pi 
+//      Deploy item done
+//      Messagecontent: empty
+#define DEPLOY_ITEM     3
+
+// pi -> nxt
+//      sort in the stone
+//      Messagecontent: bucketnumber
+// nxt -> pi
+//      stone is sorted in
+//      Messagecontent: empty if done
+#define PREDICTED_BNR   4 
+
+// throw stone on line  | pi -> nxt
+// pi take picture      | nxt -> pi
+// get box number       | pi -> nxt
+// nxt ready            | nxt -> pi
+
+int BLUETOOTH_DEBUG = 0; //will be displayed on LCD for debugging information
+
 /**
- * @brief Will be called once when the NXT is initialising.
- * 
- * @return true if everything worked
- * @return false if an error ocurred
+ * @brief Will be called during initialization
+ * @param numOfBuckets, sends how many buckets we have.
+ *
+ * ATTENTION: This needs to be implemented in a loop.
+ * Call this function inside ecrobot_device_initialize()
  */
-bool bluetooth_init();
+bool bluetooth_init(int numOfBuckets);
 
 /**
  * @brief Will be always called in main loop by routine.
@@ -63,4 +98,10 @@ U8 bluetooth_rcv_sort_in_box_signal();
  */
 bool bluetooth_send_stone_sorted_signal();
 
+/**
+ * @brief Will return BLUETOOTH_DEBUG, this will be displayed on the LCD for debugging.
+ * 
+ * @return int 
+ */
+int bluetooth_get_debug_int();
 #endif //BLUETOOTH_H
