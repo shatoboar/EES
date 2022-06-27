@@ -1,6 +1,6 @@
 #include "controller.h"
 #include "../colorDetection/colordetection.h"
-#include "../BluetoothService.h"
+#include "../BluetoothService/BluetoothService.h"
 
 int init_ps() {
     return 4;
