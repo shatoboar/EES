@@ -22,9 +22,9 @@ add_executable(Bluetooth_Service
         BluetoothService/BluetoothService.h)
 add_executable(EES_Controller
         Controller/controller.cpp
+        BluetoothService/BluetoothService.h BluetoothService/BluetoothService.cpp
         Controller/controller.h Controller/controller.cpp
-        colorDetection/colordetection.h colorDetection/colordetection.cpp
-        BluetoothService/BluetoothService.h BluetoothService/BluetoothService.cpp)
+        colorDetection/colordetection.h colorDetection/colordetection.cpp)
 
 add_executable(Color_Test
         colorDetection/tests/test_colordetection.cpp

@@ -61,7 +61,7 @@ int Controller::bucketSortColor() {
     }
 
     if (usedBuckets < numberBuckets) {
-        if (detected.first != Color_detected::no_object || detected.first != Color_detected::several_colors) {
+        if (detected.first != Color_detected::no_object && detected.first != Color_detected::several_colors) {
             sortedBuckets.push_back(detected);
             usedBuckets += 1;
             return usedBuckets;
@@ -72,7 +72,25 @@ int Controller::bucketSortColor() {
 }
 
 int Controller::bucketSortSize() {
+    for (int index = 0; index < sortedBuckets.size(); index++) {
+        pair<Color_detected, Size_detected> element = sortedBuckets.at(index);
 
+        if (element.second == detected.second) {
+            return index+2;
+        }
+
+    }
+
+    if (usedBuckets < numberBuckets) {
+        if (detected.second != Size_detected::no_bricks && detected.second != Size_detected::serveral_sizes
+        && detected.second != Size_detected::unknown_sizes) {
+            sortedBuckets.push_back(detected);
+            usedBuckets += 1;
+            return usedBuckets;
+        }
+    }
+
+    return 1;
 }
 
 int Controller::bucketSortColorSize() {
