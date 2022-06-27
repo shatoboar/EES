@@ -1,9 +1,3 @@
-//
-// Created by Timo Oeltze on 31.05.22.
-//
-
-#ifndef EES_COLORDETECTION_H
-#define EES_COLORDETECTION_H
 #include <iostream>
 #include <string.h>
 #include <opencv2/core.hpp>
@@ -62,5 +56,3 @@ public:
     vector<Point> get_blue_counter();
     vector<Point> get_yellow_counter();
 };
-
-#endif //EES_COLORDETECTION_H

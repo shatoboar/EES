@@ -1,15 +1,8 @@
-//
-// Created by Timo Oeltze on 13.06.22.
-//
-
-#ifndef EES_CONTROLLER_H
-#define EES_CONTROLLER_H
 #include "../colorDetection/colordetection.h"
 using namespace std;
 using namespace cv;
 
 enum SortingMode {colorOnly, shapeOnly, colorAndShape};
-
 
 class Controller {
 public:
@@ -26,6 +19,3 @@ public:
     int bucketSortSize();
     int bucketSortColorSize();
 };
-
-
-#endif //EES_CONTROLLER_H
