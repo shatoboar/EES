@@ -228,7 +228,7 @@ void BluetoothService::CloseConnection(){
 	printf("Connection Closed\n");
 }
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
 
 	BluetoothService bt;
@@ -241,5 +241,5 @@ int main(int argc, char **argv)
 	bt.CloseConnection();
 
 	return 0;
-}
+}*/
 
