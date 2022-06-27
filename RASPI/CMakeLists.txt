@@ -17,6 +17,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 include_directories(colorDetection)
 include_directories(BluetoothService)
+include_directories(Controller)
 add_executable(Bluetooth_Service
         BluetoothService/BluetoothService.cpp
         BluetoothService/BluetoothService.h)
@@ -35,6 +36,7 @@ add_test(NAME ColorDectection_Test COMMAND Color_Test)
 
 target_link_libraries(Bluetooth_Service "bluetooth")
 target_link_libraries(EES_Controller ${OpenCV_LIBS})
+target_link_libraries(EES_Controller "bluetooth")
 target_link_libraries(Color_Test ${OpenCV_LIBS})
 add_library(colorDetection colorDetection/colordetection.cpp)
 target_include_directories(colorDetection PUBLIC include)

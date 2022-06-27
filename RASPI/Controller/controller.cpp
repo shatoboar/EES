@@ -2,44 +2,8 @@
 #include "../colorDetection/colordetection.h"
 #include "../BluetoothService/BluetoothService.h"
 
-int init_ps() {
-    return 4;
-}
-
-bool hasConnection(int value) {
-    if (value > 0) {
-        return true;
-    }
-
-    return false;
-}
-
-bool readyForNewObject() {
-    //TODO: readyForNewObject from API
-    return true;
-}
-
-/*void mainRoutine(Controller newController) {
-    bool ready = readyForNewObject();
-
-    while (ready) {
-        //TODO: take picture
-        char* filepath = "../picturesFinalPosition/blueBrickOnLineLeft.jpg";
-        ColorDetection newColorDetection(filepath);
-
-        if (newColorDetection.onlyOneColor()) {
-
-        } else if (//){
-            //TODO: return error (255) - more then one brick (same color) on the line, no brick on the line
-        }
-
-        ready = readyForNewObject();
-    }
-
-}*/
-
-/*
- * return false if taking a picture processes an error
+/**
+ * take a picture and save result in class var detected
  */
 void Controller::analysePicture() {
     system("raspistill -o pic.jpg -t 100");
@@ -49,6 +13,9 @@ void Controller::analysePicture() {
     detected = pair<Color_detected, Size_detected>(analyzer.color_detection_result, analyzer.size_detection_result);
 }
 
+/**
+ * @return bucket number in which a stone should be sorted
+ */
 int Controller::bucketSortColor() {
 
     for (int index = 0; index < sortedBuckets.size(); index++) {
