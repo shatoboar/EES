@@ -1,6 +1,8 @@
 #ifndef BLUETOOTHSERVICE_H
 #define BLUETOOTHSERVICE_H
 
+#include "stdint.h"
+
 class BluetoothService
 {
 private:

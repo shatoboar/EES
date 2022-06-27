@@ -1,5 +1,6 @@
 #include "controller.h"
 #include "../colorDetection/colordetection.h"
+#include "../BluetoothService.h"
 
 int init_ps() {
     return 4;
@@ -37,54 +38,85 @@ bool readyForNewObject() {
 
 }*/
 
-int main(int argc, char* argv[]){
-    /*Controller newController;
-    newController.buckets = init_ps();
-    newController.hasConnection = hasConnection(newController.buckets);
+/*
+ * return false if taking a picture processes an error
+ */
+void Controller::analysePicture() {
+    system("raspistill -o pic.jpg -t 100");
+    ColorDetection analyzer("pic.jpg");
 
-    if (newController.hasConnection) {
-        //mainRoutine(newController);
-    }*/
-    ColorDetection new_detection(argv[1]);
-    switch(new_detection.color_detection_result){
-        case Color_detected::red:
-            cout << "Red Brick on Line\n";
-            break;
-        case Color_detected::green:
-            cout << "Green Brick on Line\n";
-            break;
-        case Color_detected::blue:
-            cout << "Blue Brick on Line\n";
-            break;
-        case Color_detected::yellow:
-            cout << "Yellow Brick on Line\n";
-            break;
-        case Color_detected::no_object:
-            cout << "No detected colour on Line\n";
-            break;
-        case Color_detected::several_colors:
-            cout << "Several Colors on Line\n";
-            break;
-    }
-    switch (new_detection.size_detection_result) {
-        case Size_detected::two_times_four:
-            cout << "2x4 detected\n";
-            break;
-        case Size_detected::two_times_three:
-            cout << "2x3 detected\n";
-            break;
-        case Size_detected::two_times_two:
-            cout << "2x2 detected\n";
-            break;
-        case Size_detected::serveral_sizes:
-            cout << "More than 1 size detected\n";
-            break;
-        case Size_detected::no_bricks:
-            cout << "No bricks on line\n";
-            break;
-    }
+    system("rm pic.jpg");
+    detected = pair<Color_detected, Size_detected>(analyzer.color_detection_result, analyzer.size_detection_result);
 }
 
-Controller::Controller() {
-    hasConnection = false;
+int Controller::bucketSortColor() {
+
+    for (int index = 0; index < sortedBuckets.size(); index++) {
+        pair<Color_detected, Size_detected> element = sortedBuckets.at(index);
+
+        if (element.first == detected.first) {
+            return index+2;
+        }
+
+    }
+
+    if (usedBuckets < numberBuckets) {
+        if (detected.first != Color_detected::no_object || detected.first != Color_detected::several_colors) {
+            sortedBuckets.push_back(detected);
+            usedBuckets += 1;
+            return usedBuckets;
+        }
+    }
+
+    return 1;
+}
+
+int Controller::bucketSortSize() {
+
+}
+
+int Controller::bucketSortColorSize() {
+
+}
+
+void mainRoutine(Controller controller, BluetoothService bl_service) {
+    controller.hasConnection = true;
+
+    while (controller.hasConnection) {
+        int bucketID;
+
+        bl_service.DeployRoutine();
+
+        controller.analysePicture();
+
+        switch (controller.mode) {
+            case SortingMode::colorOnly:
+                bucketID = controller.bucketSortColor();
+                break;
+            case SortingMode::shapeOnly:
+                bucketID = controller.bucketSortSize();
+                break;
+            case SortingMode::colorAndShape:
+                bucketID = controller.bucketSortColorSize();
+                break;
+        }
+
+        bl_service.SendClassificationRoutine(bucketID);
+    }
+
+    bl_service.CloseConnection();
+}
+
+int main(int argc, char* argv[]){
+    Controller controller(SortingMode::colorOnly);
+    BluetoothService bl_service;
+
+    controller.numberBuckets = bl_service.InitRoutine();
+    controller.usedBuckets = 1;
+    controller.sortedBuckets = {};
+    mainRoutine(controller, bl_service);
+}
+
+Controller::Controller(SortingMode setMode) {
+    mode = setMode;
 }
