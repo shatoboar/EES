@@ -283,7 +283,7 @@ TASK(MainTask) {
 
         switch(MODE) {
             case RESET_TASK:
-                movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, -70); //reset pusher to idle
+                movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, 70); //reset pusher to idle
                 MODE = CALIBRATE_MOVE_LEFT_TASK;
                 break;
             case THROW_STONE_TASK:
@@ -302,7 +302,7 @@ TASK(MainTask) {
                 //send signal to PI that NXT is ready
                 ok = bluetooth_send_stone_sorted_signal();
                 if (ok) {
-                    MODE = READY_FOR_STONE_TASK;
+                    MODE = GO_TO_DISPENSER_TASK;
                 }
                 break;
 
@@ -380,10 +380,10 @@ TASK(MainTask) {
 
             if (ecrobot_get_touch_sensor(SENSOR_TOUCH_LEFT)) {
               nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
-              movesDegrees(MOTOR_MOVE, 50, 100); //move back
+              movesDegrees(MOTOR_MOVE, 75, 100); //move back
               TOUCH_SENSOR_LEFT_ACTIVATED = false;
               CURRENT_BOX = 0;
-              MODE = THROW_STONE_ON_LINE_TASK;
+              MODE = READY_FOR_STONE_TASK;
             }
           break;
 
@@ -436,7 +436,7 @@ TASK(MainTask) {
                 }
                 if (ecrobot_get_touch_sensor(SENSOR_TOUCH_LEFT)) {
                     //nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
-                    movesDegrees(MOTOR_MOVE, 180, 100);
+                    movesDegrees(MOTOR_MOVE, 70, 100);
                     TOUCH_SENSOR_LEFT_ACTIVATED = false;
                     MODE = READY_FOR_STONE_TASK;
                 }
@@ -444,8 +444,8 @@ TASK(MainTask) {
 
             case THROW_STONE_ON_LINE_TASK:
                 //move dispenser and drop stone
-                movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, 85); //push
-                movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, -85); //and retreat
+                movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, -85); //push
+                movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, 85); //and retreat
 
                 //TODO: Send signal to PI to take picture
                 ok = bluetooth_send_next_picture_signal();
