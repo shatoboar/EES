@@ -6,7 +6,8 @@
  */
 void Controller::analysePicture() {
     system("raspistill -o pic.jpg -t 100");
-    ColorDetection analyzer("pic.jpg");
+    char *p = strdup("pic.jpg");
+    ColorDetection analyzer(p);
 
     system("rm pic.jpg");
     detected = pair<Color_detected, Size_detected>(analyzer.color_detection_result, analyzer.size_detection_result);
@@ -137,6 +138,15 @@ void mainRoutine(Controller controller, BluetoothService bl_service) {
 }
 
 int main(int argc, char* argv[]){
+    if(string(argv[1]) == "color"){
+        Controller controller(SortingMode::colorOnly);
+    }else if(string(argv[1]) == "shape"){
+        Controller controller(SortingMode::shapeOnly);
+    }else if(string(argv[1]) == "both"){
+        Controller controller(SortingMode::colorAndShape);
+    }else{
+        return 0;
+    }
     Controller controller(SortingMode::colorOnly);
     BluetoothService bl_service;
 
