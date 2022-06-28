@@ -91,7 +91,7 @@ int Controller::bucketSortColorSize() {
     if (usedBuckets < numberBuckets) {
         //conditions that no bucket should be mapped (for color and size)
         if (detected.second != Size_detected::no_bricks && detected.second != Size_detected::serveral_sizes
-            && detected.second != Size_detected::unknown_sizes) {
+            && detected.second != Size_detected::unknown_sizes && detected.first != Color_detected::several_colors) {
             sortedBuckets.push_back(detected);
             usedBuckets += 1;
             return usedBuckets;
