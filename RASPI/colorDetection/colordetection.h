@@ -1,3 +1,6 @@
+#ifndef COLORDETECTION_H
+#define COLORDETECTION_H
+
 #include <iostream>
 #include <string.h>
 #include <opencv2/core.hpp>
@@ -56,3 +59,5 @@ public:
     vector<Point> get_blue_counter();
     vector<Point> get_yellow_counter();
 };
+
+#endif

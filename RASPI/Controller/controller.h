@@ -1,3 +1,7 @@
+
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
+
 #include "../colorDetection/colordetection.h"
 using namespace std;
 using namespace cv;
@@ -19,3 +23,5 @@ public:
     int bucketSortSize();
     int bucketSortColorSize();
 };
+
+#endif

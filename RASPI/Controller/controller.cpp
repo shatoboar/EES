@@ -1,5 +1,4 @@
 #include "controller.h"
-#include "../colorDetection/colordetection.h"
 #include "../BluetoothService/BluetoothService.h"
 
 /**
