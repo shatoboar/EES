@@ -18,7 +18,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(colorDetection)
 include_directories(BluetoothService)
 include_directories(Controller)
-add_executable(Bluetooth_Service
+add_library(Bluetooth_Service
         BluetoothService/BluetoothService.cpp
         BluetoothService/BluetoothService.h)
 add_executable(EES_Controller
