@@ -23,20 +23,13 @@ add_library(Bluetooth_Service
 
 add_library(Color_Detection
         colorDetection/colordetection.cpp)
-#add_library(Color_Test
- #       colorDetection/tests/test_colordetection.cpp
-       # colorDetection/tests/test_colordetection.h colorDetection/tests/test_colordetection.cpp
-     #   colorDetection/colordetection.h colorDetection/colordetection.cpp)
+add_executable(Color_Test colorDetection/tests/test_colordetection.cpp)
 add_executable(EES_Controller
         Controller/controller.cpp)
 
-
-
-#add_test(NAME ColorDectection_Test COMMAND Color_Test)
+add_test(NAME ColorDectection_Test COMMAND Color_Test)
 
 target_link_libraries(EES_Controller Color_Detection ${OpenCV_LIBS} Bluetooth_Service "bluetooth")
-#target_link_libraries(Color_Test ${OpenCV_LIBS})
-
-
+target_link_libraries(Color_Test Color_Detection ${OpenCV_LIBS})
 
 
