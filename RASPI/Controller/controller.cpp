@@ -1,52 +1,161 @@
 #include "controller.h"
-#include "../colorDetection/colordetection.h"
+#include "../BluetoothService/BluetoothService.h"
 
-int init_ps() {
-    return 4;
+/**
+ * take a picture and save result in class var detected
+ */
+void Controller::analysePicture() {
+    system("raspistill -o pic.jpg -t 100");
+    char *p = strdup("pic.jpg");
+    ColorDetection analyzer(p);
+
+    system("rm pic.jpg");
+    detected = pair<Color_detected, Size_detected>(analyzer.color_detection_result, analyzer.size_detection_result);
 }
 
-bool hasConnection(int value) {
-    if (value > 0) {
-        return true;
-    }
+/**
+ * @return bucket number in which a stone should be sorted by color
+ */
+int Controller::bucketSortColor() {
 
-    return false;
-}
+    //check whether the color is already mapped to a bucket
+    for (int index = 0; index < sortedBuckets.size(); index++) {
+        pair<Color_detected, Size_detected> element = sortedBuckets.at(index);
 
-bool readyForNewObject() {
-    //TODO: readyForNewObject from API
-    return true;
-}
-
-/*void mainRoutine(Controller newController) {
-    bool ready = readyForNewObject();
-
-    while (ready) {
-        //TODO: take picture
-        char* filepath = "../picturesFinalPosition/blueBrickOnLineLeft.jpg";
-        ColorDetection newColorDetection(filepath);
-
-        if (newColorDetection.onlyOneColor()) {
-
-        } else if (//){
-            //TODO: return error (255) - more then one brick (same color) on the line, no brick on the line
+        //first pair is the color of a stone
+        if (element.first == detected.first) {
+            return index+2;
         }
 
-        ready = readyForNewObject();
     }
 
-}*/
-
-int main(int argc, char* argv[]){
-    Controller newController;
-    newController.buckets = init_ps();
-    newController.hasConnection = hasConnection(newController.buckets);
-
-    if (newController.hasConnection) {
-        //mainRoutine(newController);
+    //are buckets left to sort / map stones to
+    if (usedBuckets < numberBuckets) {
+        //conditions that no bucket should be mapped
+        if (detected.first != Color_detected::no_object && detected.first != Color_detected::several_colors) {
+            sortedBuckets.push_back(detected);
+            usedBuckets += 1;
+            return usedBuckets;
+        }
     }
+
+    //is rest bucket
+    return 1;
 }
 
-Controller::Controller() {
-    hasConnection = false;
+/**
+ * @return bucket number in which a stone should be sorted by size
+ */
+int Controller::bucketSortSize() {
+
+    //check whether the size of a stone is already mapped to a bucket
+    for (int index = 0; index < sortedBuckets.size(); index++) {
+        pair<Color_detected, Size_detected> element = sortedBuckets.at(index);
+
+        //second pair is the size of a stone
+        if (element.second == detected.second) {
+            return index+2;
+        }
+
+    }
+
+    //are buckets left to sort / map stones to
+    if (usedBuckets < numberBuckets) {
+        //conditions that no bucket should be mapped
+        if (detected.second != Size_detected::no_bricks && detected.second != Size_detected::serveral_sizes
+            && detected.second != Size_detected::unknown_sizes) {
+            sortedBuckets.push_back(detected);
+            usedBuckets += 1;
+            return usedBuckets;
+        }
+    }
+
+    //is rest bucket
+    return 1;
+}
+
+/**
+ * @return bucket number in which a stone should be sorted by combination of color and size
+ */
+int Controller::bucketSortColorSize() {
+
+    //check whether the combination of size and color of a stone is already mapped to a bucket
+    for (int index = 0; index < sortedBuckets.size(); index++) {
+        pair<Color_detected, Size_detected> element = sortedBuckets.at(index);
+
+        if (element == detected) {
+            return index+2;
+        }
+    }
+
+    //are buckets left to sort / map stones to
+    if (usedBuckets < numberBuckets) {
+        //conditions that no bucket should be mapped (for color and size)
+        if (detected.second != Size_detected::no_bricks && detected.second != Size_detected::serveral_sizes
+            && detected.second != Size_detected::unknown_sizes && detected.first != Color_detected::several_colors) {
+            sortedBuckets.push_back(detected);
+            usedBuckets += 1;
+            return usedBuckets;
+        }
+    }
+
+    //is rest bucket
+    return 1;
+}
+
+/**
+ * loop for taking picture of stone on the line, analysing them and sending mapped bucket for stone to NXT
+ * @param controller
+ * @param bl_service
+ */
+void mainRoutine(Controller controller, BluetoothService bl_service) {
+    //maybe later in use to close bluetooth connection
+    controller.hasConnection = true;
+
+    while (controller.hasConnection) {
+        int bucketID;
+
+        bl_service.DeployRoutine();
+
+        controller.analysePicture();
+
+        switch (controller.mode) {
+            case SortingMode::colorOnly:
+                bucketID = controller.bucketSortColor();
+                break;
+            case SortingMode::shapeOnly:
+                bucketID = controller.bucketSortSize();
+                break;
+            case SortingMode::colorAndShape:
+                bucketID = controller.bucketSortColorSize();
+                break;
+        }
+
+        bl_service.SendClassificationRoutine(bucketID);
+    }
+
+    bl_service.CloseConnection();
+}
+
+int main(int argc, char* argv[]){
+    if(string(argv[1]) == "color"){
+        Controller controller(SortingMode::colorOnly);
+    }else if(string(argv[1]) == "shape"){
+        Controller controller(SortingMode::shapeOnly);
+    }else if(string(argv[1]) == "both"){
+        Controller controller(SortingMode::colorAndShape);
+    }else{
+        return 0;
+    }
+    Controller controller(SortingMode::colorOnly);
+    BluetoothService bl_service;
+
+    controller.numberBuckets = bl_service.InitRoutine();
+    controller.usedBuckets = 1;
+    controller.sortedBuckets = {};
+    mainRoutine(controller, bl_service);
+}
+
+Controller::Controller(SortingMode setMode) {
+    mode = setMode;
 }

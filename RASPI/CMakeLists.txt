@@ -17,28 +17,25 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 include_directories(colorDetection)
 include_directories(BluetoothService)
-add_executable(Bluetooth_Service
-        BluetoothService/BluetoothService.cpp
-        BluetoothService/BluetoothService.h)
+include_directories(Controller)
+add_library(Bluetooth_Service
+        BluetoothService/BluetoothService.cpp)
+
+add_library(Color_Detection
+        colorDetection/colordetection.cpp)
+#add_library(Color_Test
+ #       colorDetection/tests/test_colordetection.cpp
+       # colorDetection/tests/test_colordetection.h colorDetection/tests/test_colordetection.cpp
+     #   colorDetection/colordetection.h colorDetection/colordetection.cpp)
 add_executable(EES_Controller
-        Controller/controller.cpp
-        Controller/controller.h Controller/controller.cpp
-        colorDetection/colordetection.h colorDetection/colordetection.cpp)
-        #./Controller/controller.cpp
-        #./Controller/controller.h ./Controller/controller.cpp)
+        Controller/controller.cpp)
 
-add_executable(Color_Test
-        colorDetection/tests/test_colordetection.cpp
-        colorDetection/tests/test_colordetection.h colorDetection/tests/test_colordetection.cpp
-        colorDetection/colordetection.h colorDetection/colordetection.cpp)
 
-add_test(NAME ColorDectection_Test COMMAND Color_Test)
 
-target_link_libraries(Bluetooth_Service "bluetooth")
-target_link_libraries(EES_Controller ${OpenCV_LIBS})
-target_link_libraries(Color_Test ${OpenCV_LIBS})
-add_library(colorDetection colorDetection/colordetection.cpp)
-target_include_directories(colorDetection PUBLIC include)
+#add_test(NAME ColorDectection_Test COMMAND Color_Test)
+
+target_link_libraries(EES_Controller Color_Detection ${OpenCV_LIBS} Bluetooth_Service "bluetooth")
+#target_link_libraries(Color_Test ${OpenCV_LIBS})
 
 
 
