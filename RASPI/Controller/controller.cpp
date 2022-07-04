@@ -5,7 +5,7 @@
  * take a picture and save result in class var detected
  */
 void Controller::analysePicture() {
-    system("raspistill -o pic.jpg -t 100");
+    system("raspistill -o pic.jpg -t 3000");
     char *p = strdup("pic.jpg");
     ColorDetection analyzer(p);
 
@@ -131,6 +131,7 @@ void mainRoutine(Controller controller, BluetoothService bl_service) {
                 break;
         }
 
+        cout << "To sort in bucket " << bucketID << endl;
         bl_service.SendClassificationRoutine(bucketID);
     }
 

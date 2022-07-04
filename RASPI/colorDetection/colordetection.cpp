@@ -83,6 +83,7 @@ vector<Point> detect_max_color(Mat mask, Color search_color, ColorDetection *c) 
     if(object_counter > 0){
         switch(search_color){
             case Color::red:
+                cout << "red brick found \n";
                 c->red_brick = true;
                 if(object_counter > 1){
                     c->red_brick_only_one = false;
@@ -91,6 +92,7 @@ vector<Point> detect_max_color(Mat mask, Color search_color, ColorDetection *c) 
                 }
                 break;
             case Color::green:
+                cout << "green brick found \n";
                 c->green_brick = true;
                 if(object_counter > 1){
                     c->green_brick_only_one = false;
@@ -99,6 +101,7 @@ vector<Point> detect_max_color(Mat mask, Color search_color, ColorDetection *c) 
                 }
                 break;
             case Color::blue:
+                cout << "blue brick found \n";
                 c->blue_brick = true;
                 if(object_counter > 1){
                     c->blue_brick_only_one = false;
@@ -107,6 +110,7 @@ vector<Point> detect_max_color(Mat mask, Color search_color, ColorDetection *c) 
                 }
                 break;
             case Color::yellow:
+                cout << "yellow brick found \n";
                 c->yellow_brick = true;
                 if(object_counter > 1){
                     c->yellow_brick_only_one = false;
