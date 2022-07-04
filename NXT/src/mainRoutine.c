@@ -257,6 +257,7 @@ TASK(MainTask) {
          * Helper guard, so the motor won't be set every tick
          */
         static bool shouldSetSpeed = true;
+        static bool inited = false;
 
         //for simulating the raspberry pi
         static int boxes[] = {0, 3, 2, 1, 0}; //simulate data from raspberry pi TODO remove
@@ -307,8 +308,8 @@ TASK(MainTask) {
                 break;
 
 
-            case MOVE_TO_BOX_TASK:
 
+            case MOVE_TO_BOX_TASK:
                 GetResource(ResourceMainRobot);
 
                 //Move robot until a calibration stone is found
@@ -407,11 +408,12 @@ TASK(MainTask) {
                 nxt_motor_set_speed(MOTOR_ASSEMBLY_LINE, 0, 1);
                 nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
                 nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
-
-                ok = bluetooth_init(4);
-                if (ok) { //TODO
-
-                }
+                
+                if(!inited){
+                    ok = bluetooth_init(4);
+                    inited = true;
+                    }
+                
 
                 //TODO wait until next stone signal from bluetooth module is coming
                 ok = bluetooth_rcv_next_stone_signal();
