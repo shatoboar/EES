@@ -139,19 +139,21 @@ void mainRoutine(Controller controller, BluetoothService bl_service) {
 }
 
 int main(int argc, char* argv[]){
+    Controller controller = Controller(SortingMode::colorOnly);
+
     if(string(argv[1]) == "color"){
         cout << "color mode" << endl;
-        Controller controller(SortingMode::colorOnly);
+        controller = Controller(SortingMode::colorOnly);
     }else if(string(argv[1]) == "shape"){
         cout << "shape mode" << endl;
-        Controller controller(SortingMode::shapeOnly);
+        controller = Controller(SortingMode::shapeOnly);
     }else if(string(argv[1]) == "both"){
         cout << "color and shape mode" << endl;
-        Controller controller(SortingMode::colorAndShape);
+        controller = Controller(SortingMode::colorAndShape);
     }else{
         return 0;
     }
-    Controller controller(SortingMode::colorOnly);
+
     BluetoothService bl_service;
 
     controller.numberBuckets = bl_service.InitRoutine();
