@@ -85,7 +85,7 @@ static int CURRENT_BOX = 0;
 /**
  *  Number of boxes on the line. Now hardcoded, could be counted in the future by the robot
  */
-static int NUMBER_OF_BOXES = 4;
+static int NUMBER_OF_BOXES = 7;
 /**
  * 
  * FLAG, if a touch sensor is activated and should be touched in the next time.
@@ -130,9 +130,9 @@ void ecrobot_device_initialize(void)
     nxt_motor_set_speed(MOTOR_ASSEMBLY_LINE, 0, 1);
     nxt_motor_set_speed(MOTOR_DISPENSER, 0, 1);
     nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
-#ifndef RUNTIME_CONNECTION
-    ecrobot_init_bt_slave("1234");
-#endif
+    #ifndef RUNTIME_CONNECTION
+        ecrobot_init_bt_slave("1234");
+    #endif
 
     ecrobot_set_light_sensor_active(SENSOR_CALIBRATION_STONE);
 }
@@ -172,7 +172,7 @@ TASK(EventDispatcherTask)
     //middle big button dispatching
     isPressed = ecrobot_is_ENTER_button_pressed();
     //prototype of calibrating the light sensor
-    if (isPressed == 1 && !wasPressedLastTick) { //TODO: maybe remove?
+    if (isPressed == 1 && !wasPressedLastTick) {
 
         //calibrate Threshold
         //Poll light data
@@ -259,27 +259,10 @@ TASK(MainTask) {
         static bool shouldSetSpeed = true;
         static bool inited = false;
 
-        //for simulating the raspberry pi
-        static int boxes[] = {0, 3, 2, 1, 0}; //simulate data from raspberry pi TODO remove
-        static int current_box_index = -1; //-1 is init TODO remove
-        static int max_box = 5; //TODO remove maybe
-        static bool should_finish = false; //TODO remove
-
         static bool ok; //helper flag
         static U8 box; 
-
-
-/*
-        ok = bluetooth_init(4);
-        if (ok) { //TODO
-            display_string("Hey it worked");
-            display_update();
-        }*/
         
-        ok = bluetooth_poll();
-        if (ok) { //TODO
-
-        }
+        bluetooth_poll();
         ok = false;
 
         switch(MODE) {
@@ -302,9 +285,8 @@ TASK(MainTask) {
 
                 //send signal to PI that NXT is ready
                 ok = bluetooth_send_stone_sorted_signal();
-                if (ok) {
-                    MODE = GO_TO_DISPENSER_TASK;
-                }
+                MODE = GO_TO_DISPENSER_TASK;
+
                 break;
 
 
@@ -410,20 +392,17 @@ TASK(MainTask) {
                 nxt_motor_set_speed(MOTOR_MOVE, 0, 1);
                 
                 if(!inited){
-                    ok = bluetooth_init(4);
+                    bluetooth_init(NUMBER_OF_BOXES);
                     inited = true;
-                    }
+                }
                 
 
-                //TODO wait until next stone signal from bluetooth module is coming
-                ok = bluetooth_rcv_next_stone_signal();
+                //wait until next stone signal from bluetooth module is coming
+                bluetooth_rcv_next_stone_signal();
 
-                if (ok) {
-                    //Throw stone the assembly line
-                    MODE = THROW_STONE_ON_LINE_TASK;
-                } else {
-                    MODE = ERROR_FATAL; //TODO maybe replace
-                }
+                //Throw stone the assembly line
+                MODE = THROW_STONE_ON_LINE_TASK;
+
                 break;
 
             case CALIBRATE_MOVE_LEFT_TASK:
@@ -448,45 +427,32 @@ TASK(MainTask) {
                 //move dispenser and drop stone
                 movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, -85); //push
                 movesDegrees(MOTOR_DISPENSER, DEGREES_DISPENSER, 85); //and retreat
-
-                //TODO: Send signal to PI to take picture
+                
+                //TODO RICHARDT: hier einfügen, dass sich Assembly Line leicht nach vorne bewegt und Stein besser im Zentrum der Kamera ist
+                //send signal to PI, to take a picture
                 ok = bluetooth_send_next_picture_signal();
-                if (ok) {
-                    MODE = TAKE_PICTURE_TASK;
-                } else {
-                    MODE = ERROR_FATAL;
-                }
+
+                MODE = TAKE_PICTURE_TASK;
 
                 break;
 
             case TAKE_PICTURE_TASK:
 
-                //TODO wait until signal from PI for correct box info
+                //wait until signal from PI for correct box info
                 box = bluetooth_rcv_sort_in_box_signal();
+                box = box - 1; //important, because in the network protocol we start counting with number one
 
-                //MOCK SIMULATION TODO remove
-                current_box_index++; //current_box_index is only for simulating PI data and will be removed later
-                if (current_box_index >= max_box) {
-                    current_box_index = -1;
-                    should_finish = true; //TODO remove
-                }
-                //set next target
+
                 GetResource(ResourceExecuteCommand);
-                //TODO remove !should_finish
-                if (!should_finish) NEXT_BOX_TARGET = boxes[current_box_index]; 
                 
-                //BLUETOOTH  IMPLEMENTATION, TODO remove !should_finish
-                if (!should_finish) NEXT_BOX_TARGET = box;
-                
+                //set next target
+                NEXT_BOX_TARGET = box;
+
                 ReleaseResource(ResourceExecuteCommand);
 
                 MODE = CALC_NEXT_BOX_POSITION_TASK;
 
-                if (should_finish) { //TODO only for simulating PI data, will be removed
-                    MODE = IDLE_TASK;
-                }
                 break;
-
 
                 //------------------------------------ERROR HANDLING------------------------------------
             case ERROR_LIGHT:
