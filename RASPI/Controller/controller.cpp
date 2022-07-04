@@ -140,10 +140,13 @@ void mainRoutine(Controller controller, BluetoothService bl_service) {
 
 int main(int argc, char* argv[]){
     if(string(argv[1]) == "color"){
+        cout << "color mode" << endl;
         Controller controller(SortingMode::colorOnly);
     }else if(string(argv[1]) == "shape"){
+        cout << "shape mode" << endl;
         Controller controller(SortingMode::shapeOnly);
     }else if(string(argv[1]) == "both"){
+        cout << "color and shape mode" << endl;
         Controller controller(SortingMode::colorAndShape);
     }else{
         return 0;
