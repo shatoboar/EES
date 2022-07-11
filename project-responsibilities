@@ -1,0 +1,26 @@
+# Project responsiblity list
+
+## Luca Jungnickel, Role Quality Manager
+
+### Functions and concepts designed and implemented
+- robot design
+- main NXT programming
+    - implemented interfaces for the bluetooth module
+    - implementing debugging functions
+- designed and implemented an internal state chart for modelling the robot behaviour
+- designed and implemented safety requirements via the touch sensors
+- specified message types and content which are transmitted between PI and NXT
+
+### Mangement role: Quality Manager
+- focused on the embedded quality side
+- specified a coding standard for embedded systems at the beginning: https://barrgroup.com/sites/default/files/barr_c_coding_standard_2018.pdf 
+- summarized the most important aspects of this coding standard (for our group) and shared that at the beginning:
+    - https://docs.google.com/document/d/1mccZKsAIQLhvV3BfLaygU7TVCo0EuYZVr2NfokZLC_s/edit?usp=sharing 
+- coding reviews of embedded nxt code with Richard
+- designed and implemented safety requirements for the robot: (see in lower half of the state chart)
+    - recalibrate the robot if a touch sensor is hit, but this event is unexpected
+    - recalibration consists of these steps:
+        - driving back to one side
+        - counting the number of stones again
+        - if the number is correct and the bumber stone is hit: continue normal operation
+    - if recalibration failed: stop the robot
