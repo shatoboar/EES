@@ -5,7 +5,7 @@
  * take a picture and save result in class var detected
  */
 void Controller::analysePicture() {
-    system("raspistill -o pic.jpg -t 100");
+    system("raspistill -o pic.jpg -t 3000");
     char *p = strdup("pic.jpg");
     ColorDetection analyzer(p);
 
@@ -131,6 +131,7 @@ void mainRoutine(Controller controller, BluetoothService bl_service) {
                 break;
         }
 
+        cout << "To sort in bucket " << bucketID << endl;
         bl_service.SendClassificationRoutine(bucketID);
     }
 
@@ -138,16 +139,21 @@ void mainRoutine(Controller controller, BluetoothService bl_service) {
 }
 
 int main(int argc, char* argv[]){
+    Controller controller = Controller(SortingMode::colorOnly);
+
     if(string(argv[1]) == "color"){
-        Controller controller(SortingMode::colorOnly);
+        cout << "color mode" << endl;
+        controller = Controller(SortingMode::colorOnly);
     }else if(string(argv[1]) == "shape"){
-        Controller controller(SortingMode::shapeOnly);
+        cout << "shape mode" << endl;
+        controller = Controller(SortingMode::shapeOnly);
     }else if(string(argv[1]) == "both"){
-        Controller controller(SortingMode::colorAndShape);
+        cout << "color and shape mode" << endl;
+        controller = Controller(SortingMode::colorAndShape);
     }else{
         return 0;
     }
-    Controller controller(SortingMode::colorOnly);
+
     BluetoothService bl_service;
 
     controller.numberBuckets = bl_service.InitRoutine();
