@@ -24,3 +24,21 @@
         - counting the number of stones again
         - if the number is correct and the bumber stone is hit: continue normal operation
     - if recalibration failed: stop the robot
+    
+    
+## Filip Rejmus, Role Integration Manager
+
+### Functions and concepts designed and implemented
+- Bluetooth API specification and implementation
+    - Specification included safety measures such as checksum and acknowledgements
+    - Specified the various bluetooth states that are needed to stay in sync with NXT counterpart
+    - Specified and implemented the message definitions
+- designed a Bluetooth protocol specification chart
+- Deployed CMake across the Backend enabling us to build all libraries and executables from one place
+
+
+### Mangement role: Integration Manager
+- Specified interfaces of bluetooth API
+- Specified Bluetooth protocols
+- Supported setup of CMake across the whole backend
+- Integrated NXT and Raspberry Pi at the last stage by resolving remaining bugs caused by the integration
