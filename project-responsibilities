@@ -25,6 +25,28 @@
         - if the number is correct and the bumber stone is hit: continue normal operation
     - if recalibration failed: stop the robot
     
+## Richardt Joergensen, Role Quality Manager
+
+### Functions and concepts designed and implemented
+- main robot design
+    - created first and second robot design for assembly line
+    - created dispenser module in different versions
+    - created boxsystem, which is upgradeable
+    - 
+- NXT programming
+    - helped implementing interfaces for the bluetooth module
+- helped designing and implementing an internal state chart for modelling the robot behaviour
+- helped designing and implementing safety requirements via the touch sensors
+
+### Mangement role: Quality Manager
+- coding reviews of embedded nxt code with Luca
+- helped designing and implementing safety requirements for the robot: (see in lower half of the state chart)
+    - recalibrate the robot if a touch sensor is hit, but this event is unexpected
+    - recalibration consists of these steps:
+        - driving back to one side
+        - counting the number of stones again
+        - if the number is correct and the bumber stone is hit: continue normal operation
+    - if recalibration failed: stop the robot
     
 ## Filip Rejmus, Role Integration Manager
 
