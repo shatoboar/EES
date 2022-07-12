@@ -1,5 +1,5 @@
 # Group name
-**Group members**: Filip Rejmus, Sang Woo Bae, ...TODO
+**Group members**: Filip Rejmus, Sang Woo Bae, Tristan Brech...TODO
 
 ## Project overview
 
@@ -64,24 +64,27 @@ The same: **Why** did you choose this environment?
 ![evironment](./images/environment.png)
 
 ### Algorithms
-Write an introduction to the **most essential** algorithms or technologies in general that you have chosen for your project. 
+Let'stake a look at the process of analysing a picture:
 
-Maybe with **short** code examples.
-
-```python
-def our_algorithm(x, y):
-    # Do fancy stuff here
-    return {'x': x, 'y': y}
-```
+1. read the picture
+1. convert picture from RGB to HSV
+1. define masks for each color to be detected
+1. dilate masks
+ **for each color**
+1. remove all pixels that aren't that color
+1. get the area and number of non-zero pixels
+1. check whether it exceeds a minimum required size, so that no small colored pixels on the assembly line get detected as objects
+1. check in which category the size of the object belongs and set variables
+1. set varibale for the color detected 
 
 ## Summary
-Overview of the achieved **and** not attained goals. Why were some goals not reached? Too difficult or wrong time management?
+We achieved all goals and requirements, but with certain limitations. Color detection works reliable, but size detection works only for 2x2 and 2x4 lego pieces reliably. Objects that have the same or similiar size as the 2x2 and 2x4 lego pieces and are one of our chosen colors could also be misinterpreted as lego pieces. To fix those problems would be a difficult task that requires more time than we had available in the end. With enough lego pieces, the assembly line is adaptable to contain a variable size of containers.
 
 ### Lessons learned
-What did you learn from the project? What decisions would you have made differently from your current perspective?
+We learned that having an integrated system to test on earlier would have been helpful, especially to recognize problems with size detection early on. We also underestimated the work required and problems occurring when it comes to establishing the bluetooth connection which pushed the integrated system further back than anticipated.
 
 ### Future work
-What problems would you tackle if you would continue to work on the project? Are there things you might actually take up and work on in the future? This part is **optional**.
+We would try to better the size detection, either by improving it with our current method with OpenCV or by using machine learning to detect different object.
 
 
 
