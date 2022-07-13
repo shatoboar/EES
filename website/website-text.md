@@ -56,6 +56,7 @@ Our main robot has two touch sensors, one attached to each side. These are for c
 On each box is a white Lego stone attached. We call them 'calibration stones'. They are recognized by the robot's light sensor. If the light sensor is over a calibration stone, the robot is in the correct position to drop a stone from the assembly line into the box.
 Above the assembly line, the Raspberry PI camera is attached. This way, the assembly line can be analyzed and the correct element on the line recognized.
 
+![diagram](./images/robot.png)
 
 ### Environment design
 What does the environment look like in which your robot operates? 
