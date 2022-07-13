@@ -25,6 +25,28 @@
         - if the number is correct and the bumber stone is hit: continue normal operation
     - if recalibration failed: stop the robot
     
+## Richardt Joergensen, Role Quality Manager
+
+### Functions and concepts designed and implemented
+- main robot design
+    - created first and second robot design for assembly line
+    - created dispenser module in different versions
+    - created boxsystem, which is upgradeable
+    - 
+- NXT programming
+    - helped implementing interfaces for the bluetooth module
+- helped designing and implementing an internal state chart for modelling the robot behaviour
+- helped designing and implementing safety requirements via the touch sensors
+
+### Mangement role: Quality Manager
+- coding reviews of embedded nxt code with Luca
+- helped designing and implementing safety requirements for the robot: (see in lower half of the state chart)
+    - recalibrate the robot if a touch sensor is hit, but this event is unexpected
+    - recalibration consists of these steps:
+        - driving back to one side
+        - counting the number of stones again
+        - if the number is correct and the bumber stone is hit: continue normal operation
+    - if recalibration failed: stop the robot
     
 ## Filip Rejmus, Role Integration Manager
 
@@ -42,6 +64,48 @@
 - Specified Bluetooth protocols
 - Supported setup of CMake across the whole backend
 - Integrated NXT and Raspberry Pi at the last stage by resolving remaining bugs caused by the integration
+
+## Timo Oeltze, Time Manager 
+
+### Functions and concepts designed and implemented
+- Color and size detection using OpenCV
+	- Implementation of the color detection of Lego bricks 
+	- Optimization of the code for color detection
+	- Converting form python to c++
+	- implementation of size detection
+	- Wrote tests for the color detection and size detectionn using CTests
+- Implementation of the controller for the assembly line
+	- Main routine with functions from the bluetooth team
+	- Specified and implemented three modes for sorting Lego bricks with the assembly line
+- Integration testing during the recording of the final video
+
+### Mangement role: Time Manager
+- Created a gantt chart for the possible chronological sequence (by weeks) of the project
+- Milestone goals converted into tasks / issues
+- Monitoring the current status during the entire project time
+    - Time adjustment of the gantt chart after each milestone
+- changing the technical implementation due to time restraints
+
+## Tristan Brech, Time Manager 
+
+### Functions and concepts designed and implemented
+- Color and size detection using OpenCV
+	- Implementation of the color detection of Lego bricks 
+	- Optimization of the code for color detection
+	- Converting form python to c++
+	- implementation of size detection
+	- Wrote tests for the color detection and size detectionn using CTests
+- Implementation of the controller for the assembly line
+	- Main routine with functions from the bluetooth team
+	- Specified and implemented three modes for sorting Lego bricks with the assembly line
+- Integration testing during the recording of the final video
+
+### Mangement role: Time Manager
+- Created a gantt chart for the possible chronological sequence (by weeks) of the project
+- Milestone goals converted into tasks / issues
+- Monitoring the current status during the entire project time
+    - Time adjustment of the gantt chart after each milestone
+- changing the technical implementation due to time restraints
 
 ## Sang Woo Bae, Technical Manager
 
