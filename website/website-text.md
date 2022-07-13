@@ -1,5 +1,5 @@
 # Group name
-**Group members**: Filip Rejmus, Sang Woo Bae, Tristan Brech...TODO
+**Group members**: Filip Rejmus, Sang Woo Bae, Tristan Brech, Timo Oeltze, Luca Jungnickel, Richardt Joergensen
 
 ## Project overview
 
