@@ -58,12 +58,6 @@ Above the assembly line, the Raspberry PI camera is attached. This way, the asse
 
 ![diagram](./images/robot.png)
 
-### Environment design
-What does the environment look like in which your robot operates? 
-The same: **Why** did you choose this environment?
-
-![evironment](./images/environment.png)
-
 ### Algorithms
 Let'stake a look at the process of analysing a picture:
 
