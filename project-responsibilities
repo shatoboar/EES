@@ -64,3 +64,23 @@
 - Specified Bluetooth protocols
 - Supported setup of CMake across the whole backend
 - Integrated NXT and Raspberry Pi at the last stage by resolving remaining bugs caused by the integration
+
+## Timo Oeltze, Time Manager
+
+### Functions and concepts designed and implemented
+- Color and size detection using OpenCV
+	- Implementation of the color detection of Lego bricks 
+	- Optimization of the code for color detection
+	- Worked with Tristan Brech on the logic to implement size detection
+	- Wrote tests for the color detection using CTests
+- Implementation of the controller for the assembly line
+	- Main routine with functions from the bluetooth team
+	- Specified and implemented three modes for sorting Lego bricks with the assembly line
+- Integration testing during the recording of the final video
+
+### Mangement role: Time Manager
+- Created a gantt chart for the possible chronological sequence (by weeks) of the porject
+- Milestone goals converted into tasks / issues
+- Monitoring the current status during the entire project time
+    - Time adjustment of the gantt chart after each milestone
+- Way of implementing possible new features (technically)
