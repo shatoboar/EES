@@ -73,7 +73,7 @@ Let'stake a look at the process of analysing a picture:
 
  **for each color:**
 
-1. remove all pixels that aren't that color
+5. remove all pixels that aren't that color
 1. get the area and number of non-zero pixels
 1. check whether it exceeds a minimum required size, so that no small colored pixels on the assembly line get detected as objects
 1. check in which category the size of the object belongs and set variables
