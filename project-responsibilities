@@ -42,3 +42,15 @@
 - Specified Bluetooth protocols
 - Supported setup of CMake across the whole backend
 - Integrated NXT and Raspberry Pi at the last stage by resolving remaining bugs caused by the integration
+
+## Sang Woo Bae, Technical Manager
+
+### Functions and concepts designed and implemented
+- Bluetooth API specification and implementation (together with Filip, read above)
+- implementation of bluetooth for NXT
+
+### Management role: Technical Manager
+- Setup of Git repository 
+- Setup of Git PR tactics and Code reviews
+- Setup of Git keys for all machines
+- Code Reviews for all parts connected to bluetooth
