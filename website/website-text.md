@@ -83,7 +83,7 @@ Let'stake a look at the process of analysing a picture:
 We achieved all goals and requirements, but with certain limitations. Color detection works reliable, but size detection works only for 2x2 and 2x4 lego pieces reliably. Objects that have the same or similiar size as the 2x2 and 2x4 lego pieces and are one of our chosen colors could also be misinterpreted as lego pieces. To fix those problems would be a difficult task that requires more time than we had available in the end. With enough lego pieces, the assembly line is adaptable to contain a variable size of containers.
 
 ### Lessons learned
-We learned that having an integrated system to test on earlier would have been helpful, especially to recognize problems with size detection early on. We also underestimated the work required and problems occurring when it comes to establishing the bluetooth connection which pushed the integrated system further back than anticipated.
+We learned that having an integrated system to test on earlier would have been helpful, especially to recognize problems with size detection early on. We also underestimated the work required and problems occurring when it comes to establishing the bluetooth connection which pushed the integrated system further back than anticipated. Another possibility would have been to build a machine learning algorithm form the beginning for better and more reliable color and object detection.
 
 ### Future work
 We would try to better the size detection, either by improving it with our current method with OpenCV or by using machine learning to detect different object.
