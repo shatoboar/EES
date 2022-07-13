@@ -29,17 +29,10 @@ We assigned each component of our system architecture to two members of our grou
 We defined the system specifications early and rigidly sticked to them throughout the project.
 This allowed us to integrate our system continously and left space for the introduction of new hardware and software features.
 
-## System architecture
+## System architecture & Software design
 Our project consisted of three main components that each respective team worked on: The Backend, the Robot Controller and the Bluetooth component. The Backend was programmed in C++ and is functioning as the eyes of our controller. It instructs our NXT Brick via Bluetooth to place objects on the conveyor and analyzes the image to command the controller to the right bucket. The NXT Brick takes the form of a state machine that gets triggered to take a specific state by the commands arriving over bluetooth. It is programmed in C and NXTOsek, a custom C based OS for the controller hardware. The communication interfaces were exposed in both environments as high level interfaces that represent the different stages of our sorting logic as presented in the chart.
 
 ![diagram](./images/softwarechart.png)
-
-### Software design
-**Short** overview of your software design. Maybe a diagram that illustrates the connections between the individual components. 
-
-Please **do not** use the diagram from our project description.
-
-
 
 ### Robot design
 
