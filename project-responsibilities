@@ -107,3 +107,14 @@
     - Time adjustment of the gantt chart after each milestone
 - changing the technical implementation due to time restraints
 
+## Sang Woo Bae, Technical Manager
+
+### Functions and concepts designed and implemented
+- Bluetooth API specification and implementation (together with Filip, read above)
+- implementation of bluetooth for NXT
+
+### Management role: Technical Manager
+- Setup of Git repository 
+- Setup of Git PR tactics and Code reviews
+- Setup of Git keys for all machines
+- Code Reviews for all parts connected to bluetooth
