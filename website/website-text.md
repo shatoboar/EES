@@ -70,7 +70,9 @@ Let'stake a look at the process of analysing a picture:
 1. convert picture from RGB to HSV
 1. define masks for each color to be detected
 1. dilate masks
- **for each color**
+
+ **for each color:**
+
 1. remove all pixels that aren't that color
 1. get the area and number of non-zero pixels
 1. check whether it exceeds a minimum required size, so that no small colored pixels on the assembly line get detected as objects
