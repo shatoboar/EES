@@ -23,6 +23,7 @@ bool sizeTest(char* filePath, Size_detected expectation) {
 
 int main(int argc, char **argv) {
     int result = 0;
+    
     list<pair<char*, Color_detected>> testInputColor = {
             pair<char*, Color_detected>("../RASPI/colorDetection/tests/picturesFinalPosition/blueBrickOnLineLeft.jpg", Color_detected::blue),
             pair<char*, Color_detected>("../RASPI/colorDetection/tests/picturesFinalPosition/twoBlueOnLine.jpg", Color_detected::blue),
